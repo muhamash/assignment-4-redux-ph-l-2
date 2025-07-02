@@ -4,11 +4,16 @@ import { home } from './controllers/home.controller';
 import { authRouter } from './routes/auth.route';
 import { booksRouter } from './routes/books.route';
 import { borrowRouter } from './routes/borrow.route';
+import cookieParser from "cookie-parser";
 
 
 const app: Application = express()
 
-app.use(cors({ origin: '*' }));
+app.use(cookieParser());
+app.use( cors( {
+    origin: "http://localhost:3000",
+    credentials: true
+} ) );
 app.use( express.json( { type: '*/*' } ) );
 app.use( ( req, res, next ) =>
 {

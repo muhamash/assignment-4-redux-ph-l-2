@@ -16,6 +16,11 @@ const borrowSchema = new Schema<IBorrow>( {
             message: 'Quantity must be an integer',
         },
     },
+    user:{
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
     dueDate: { type: Date, required: true },
 }, {
     versionKey: false,

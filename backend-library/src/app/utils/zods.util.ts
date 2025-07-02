@@ -45,10 +45,12 @@ export const zodBookSchema = z.object( {
             message: "Copies must be a non-negative number",
         } ),
     available: z.boolean().optional(),
+    createdBy: z.string()
 } );
 
 export const zodBorrowSchema = z.object( {
     book: z.string(),
+    user: z.string(),
     quantity: z
         .number()
         .int()
@@ -110,17 +112,17 @@ export const zodFilterSchema = z.object( {
     limit: z.string().transform( Number ).default("10").optional(),
 } );
 
-export const zodUser = z.object( {
+export const zodUserSchema = z.object( {
     name: z.string().min( 1, "Name is required and must be at least 1 character" ).max( 20, "Name should not exceed 20 characters" ),
     email: z.string().email( "Invalid email format" ).max( 50, "Email should not exceed 50 characters" ),
     password: z.string().min( 6, "Password must be at least 6 characters" ).max( 128, "Password should not exceed 128 characters" ),
 } );
 
-export const zodLogin = z.object( {
+export const zodLoginSchema = z.object( {
     email: z.string().email( "Invalid email format" ).max( 50, "Email should not exceed 50 characters" ),
     password: z.string().min( 6, "Password must be at least 6 characters" ),
 } );
 
-export const zodRefreshToken = z.object( {
+export const zodRefreshTokenSchema = z.object( {
     refreshToken: z.string().min( 10, "Refresh token required" ),
 } );  

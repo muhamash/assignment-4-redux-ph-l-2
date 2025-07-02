@@ -6,10 +6,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const home_controller_1 = require("./controllers/home.controller");
+const auth_route_1 = require("./routes/auth.route");
 const books_route_1 = require("./routes/books.route");
 const borrow_route_1 = require("./routes/borrow.route");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)({ origin: '*' }));
+app.use((0, cookie_parser_1.default)());
+app.use((0, cors_1.default)({
+    origin: "http://localhost:3000",
+    credentials: true
+}));
 app.use(express_1.default.json({ type: '*/*' }));
 app.use((req, res, next) => {
     const type = req.headers['content-type'] || '';
@@ -22,6 +28,7 @@ app.use(express_1.default.json());
 app.get("/", home_controller_1.home);
 app.use("/api/books", books_route_1.booksRouter);
 app.use("/api/borrow", borrow_route_1.borrowRouter);
+app.use("/api/auth", auth_route_1.authRouter);
 app.use((req, res, next) => {
     res.status(404).json({ message: "Route not found" });
 });

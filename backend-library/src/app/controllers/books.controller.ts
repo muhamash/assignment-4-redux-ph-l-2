@@ -2,12 +2,16 @@ import { NextFunction, Request, Response } from 'express';
 import { Books } from '../models/books.model';
 import { isZodError } from '../utils/helpers.util';
 import { zodBookSchema, zodFilterSchema, zodUpdateBookSchema } from "../utils/zods.util";
+import { AuthenticatedRequest } from '../interfaces/authRequest.interface';
 
-export const createBook = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
+export const createBook = async ( req: AuthenticatedRequest, res: Response, next: NextFunction ): Promise<void> =>
 {
     try
     {
-        const zodBooks = await zodBookSchema.parseAsync( req.body );
+        const zodBooks = await zodBookSchema.parseAsync( {
+            ...req.body,
+            createdBy: req.user?.id,
+        } );
         // console.log( "Validated Book Data:", zodBooks );
         
         const book = await Books.create( zodBooks );
@@ -71,7 +75,7 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
 
         const books = await Books.find( filter ? { genre: filter } : {} )
             .sort( { [ sortBy ]: sort } )
-            .limit( limit );
+            .limit( limit ).populate("createdBy", "name email id");
 
 
         if ( !books.length )
@@ -128,7 +132,7 @@ export const getBookById = async ( req: Request, res: Response, next: NextFuncti
         const bookId = req.params?.id;
         // console.log("getBookById controller called with ID:", bookId);
         
-        const book = await Books.findById( bookId );
+        const book = await Books.findById( bookId ).populate("createdBy", "name email id");
         if ( !book )
         {
             res.status( 404 ).json( {
@@ -174,7 +178,7 @@ export const getBookById = async ( req: Request, res: Response, next: NextFuncti
     }
 };
 
-export const updateBook = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
+export const updateBook = async ( req: AuthenticatedRequest, res: Response, next: NextFunction ): Promise<void> =>
 {
     try
     {
@@ -234,7 +238,7 @@ export const updateBook = async ( req: Request, res: Response, next: NextFunctio
     }
 }   
 
-export const deleteBook = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
+export const deleteBook = async ( req: AuthenticatedRequest, res: Response, next: NextFunction ): Promise<void> =>
 {
     try
     {

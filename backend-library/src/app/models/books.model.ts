@@ -51,6 +51,11 @@ const booksSchema = new Schema<IBooks>( {
         type: Boolean,
         default: true,
     },
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
 }, {
     versionKey: false,
     timestamps: true,

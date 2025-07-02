@@ -46,6 +46,11 @@ const booksSchema = new mongoose_1.Schema({
         type: Boolean,
         default: true,
     },
+    createdBy: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
 }, {
     versionKey: false,
     timestamps: true,

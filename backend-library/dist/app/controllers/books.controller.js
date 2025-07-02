@@ -2,11 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBook = exports.updateBook = exports.getBookById = exports.getBooks = exports.createBook = void 0;
 const books_model_1 = require("../models/books.model");
-const helpers_1 = require("../utils/helpers");
-const zods_1 = require("../utils/zods");
+const helpers_util_1 = require("../utils/helpers.util");
+const zods_util_1 = require("../utils/zods.util");
 const createBook = async (req, res, next) => {
     try {
-        const zodBooks = await zods_1.zodBookSchema.parseAsync(req.body);
+        const zodBooks = await zods_util_1.zodBookSchema.parseAsync({
+            ...req.body,
+            createdBy: req.user?.id,
+        });
         // console.log( "Validated Book Data:", zodBooks );
         const book = await books_model_1.Books.create(zodBooks);
         // console.log( "Book created successfully:", req.body, book );
@@ -19,7 +22,7 @@ const createBook = async (req, res, next) => {
     }
     catch (error) {
         if (error instanceof Error) {
-            const message = (0, helpers_1.isZodError)(error)
+            const message = (0, helpers_util_1.isZodError)(error)
                 ? error.issues?.[0]?.message || "Validation error"
                 : error.message;
             res.status(500).json({
@@ -48,7 +51,7 @@ exports.createBook = createBook;
 const getBooks = async (req, res) => {
     try {
         // console.log( "getBooks controller called with query:", req.query );
-        const zodBody = await zods_1.zodFilterSchema.parseAsync(req.query);
+        const zodBody = await zods_util_1.zodFilterSchema.parseAsync(req.query);
         console.log("Validated Query Parameters:", zodBody);
         const filter = zodBody.filter;
         const sortBy = zodBody.sortBy || 'createdAt';
@@ -57,7 +60,7 @@ const getBooks = async (req, res) => {
         // console.log(filter?.toUpperCase())
         const books = await books_model_1.Books.find(filter ? { genre: filter } : {})
             .sort({ [sortBy]: sort })
-            .limit(limit);
+            .limit(limit).populate("createdBy", "name email id");
         if (!books.length) {
             res.status(404).json({
                 success: false,
@@ -75,7 +78,7 @@ const getBooks = async (req, res) => {
     catch (error) {
         // console.error( "Error in getBooks controller:", error.issues );
         if (error instanceof Error) {
-            const message = (0, helpers_1.isZodError)(error)
+            const message = (0, helpers_util_1.isZodError)(error)
                 ? error.issues?.[0]?.message || "Validation error"
                 : error.message;
             res.status(400).json({
@@ -104,7 +107,7 @@ const getBookById = async (req, res, next) => {
     try {
         const bookId = req.params?.id;
         // console.log("getBookById controller called with ID:", bookId);
-        const book = await books_model_1.Books.findById(bookId);
+        const book = await books_model_1.Books.findById(bookId).populate("createdBy", "name email id");
         if (!book) {
             res.status(404).json({
                 success: false,
@@ -146,7 +149,7 @@ const updateBook = async (req, res, next) => {
     try {
         const bookId = req.params?.id;
         // console.log("updateBook controller called with ID:", bookId);
-        const zodBooks = await zods_1.zodUpdateBookSchema.parseAsync(req.body);
+        const zodBooks = await zods_util_1.zodUpdateBookSchema.parseAsync(req.body);
         // console.log( "Validated Book Data for Update:", zodBooks );
         const book = await books_model_1.Books.findByIdAndUpdate(bookId, zodBooks, { new: true });
         if (!book) {
@@ -165,7 +168,7 @@ const updateBook = async (req, res, next) => {
     }
     catch (error) {
         if (error instanceof Error) {
-            const message = (0, helpers_1.isZodError)(error)
+            const message = (0, helpers_util_1.isZodError)(error)
                 ? error.issues?.[0]?.message || "Validation error"
                 : error.message;
             res.status(400).json({

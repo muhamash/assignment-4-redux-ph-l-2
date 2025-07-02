@@ -1,9 +1,13 @@
 import express from "express";
+import { createUser, login, logoutUser, refreshToken } from "../controllers/auth.controller";
+import { verifyAccessToken } from "../middleware/verifyUser.middleware";
 
 export const authRouter = express.Router();
 
-authRouter.post( "/register" );
+authRouter.post( "/register", createUser );
 
-// authRouter.post( "/login" );
+authRouter.post( "/login", login );
 
-// authRouter.post( "/refresh-token" );
+authRouter.post( "/refresh-token", verifyAccessToken, refreshToken );
+
+authRouter.post( "/logout", verifyAccessToken, logoutUser );

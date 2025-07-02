@@ -10,7 +10,10 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
     try
     {
         // console.log( "Request Body:", req.body );
-        const zodBook = await zodBorrowSchema.parseAsync( req.body );
+        const zodBook = await zodBorrowSchema.parseAsync( {
+            ...req.body,
+            user: req.user.id
+        } );
 
         const updatedBook = await Books.adjustCopiesAfterBorrow( zodBook.book, zodBook.quantity );
 
@@ -136,7 +139,7 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
                     totalQuantity: 1,
                 }
             }
-        ] );
+        ] ).populate("user", "name email id");
 
         if( summary.length === 0 )
         {

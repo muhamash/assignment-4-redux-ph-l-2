@@ -3,13 +3,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BorrowBooksSummary = exports.borrowABook = void 0;
 const books_model_1 = require("../models/books.model");
 const borrow_model_1 = require("../models/borrow.model");
-const helpers_1 = require("../utils/helpers");
-const zods_1 = require("../utils/zods");
+const helpers_util_1 = require("../utils/helpers.util");
+const zods_util_1 = require("../utils/zods.util");
 const borrowABook = async (req, res) => {
     // console.log( "borrowABook controller called" );
     try {
         // console.log( "Request Body:", req.body );
-        const zodBook = await zods_1.zodBorrowSchema.parseAsync(req.body);
+        const zodBook = await zods_util_1.zodBorrowSchema.parseAsync({
+            ...req.body,
+            user: req.user.id
+        });
         const updatedBook = await books_model_1.Books.adjustCopiesAfterBorrow(zodBook.book, zodBook.quantity);
         console.log("Validated Borrow Data:", zodBook, updatedBook);
         if (updatedBook) {
@@ -60,7 +63,7 @@ const borrowABook = async (req, res) => {
                 });
                 return;
             }
-            const message = (0, helpers_1.isZodError)(error)
+            const message = (0, helpers_util_1.isZodError)(error)
                 ? error.issues?.[0]?.message || "Validation error"
                 : error.message;
             // console.log( message );
@@ -113,7 +116,7 @@ const BorrowBooksSummary = async (req, res) => {
                     totalQuantity: 1,
                 }
             }
-        ]);
+        ]).populate("user", "name email id");
         if (summary.length === 0) {
             res.status(404).json({
                 success: false,

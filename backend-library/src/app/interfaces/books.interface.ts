@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import { Model, Schema, Types } from "mongoose";
 
 export enum Genre {
     FICTION = 'FICTION',
@@ -18,6 +18,7 @@ export interface IBooks
     description?: string;
     copies: number;
     available: boolean;
+    createdBy: Schema.Types.ObjectId;
 }
 
 export interface IBookStaticMethod extends Model<IBooks> {

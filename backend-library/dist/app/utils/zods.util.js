@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.zodFilterSchema = exports.zodUpdateBookSchema = exports.zodBorrowSchema = exports.zodBookSchema = void 0;
+exports.zodRefreshTokenSchema = exports.zodLoginSchema = exports.zodUserSchema = exports.zodFilterSchema = exports.zodUpdateBookSchema = exports.zodBorrowSchema = exports.zodBookSchema = void 0;
 const zod_1 = require("zod");
 const allowedGenres = [
     "FICTION",
@@ -44,9 +44,11 @@ exports.zodBookSchema = zod_1.z.object({
         message: "Copies must be a non-negative number",
     }),
     available: zod_1.z.boolean().optional(),
+    createdBy: zod_1.z.string()
 });
 exports.zodBorrowSchema = zod_1.z.object({
     book: zod_1.z.string(),
+    user: zod_1.z.string(),
     quantity: zod_1.z
         .number()
         .int()
@@ -100,4 +102,16 @@ exports.zodFilterSchema = zod_1.z.object({
     sortBy: zod_1.z.enum(allowedFiltersProperties).optional(),
     sort: zod_1.z.enum(["asc", "desc"]).optional(),
     limit: zod_1.z.string().transform(Number).default("10").optional(),
+});
+exports.zodUserSchema = zod_1.z.object({
+    name: zod_1.z.string().min(1, "Name is required and must be at least 1 character").max(20, "Name should not exceed 20 characters"),
+    email: zod_1.z.string().email("Invalid email format").max(50, "Email should not exceed 50 characters"),
+    password: zod_1.z.string().min(6, "Password must be at least 6 characters").max(128, "Password should not exceed 128 characters"),
+});
+exports.zodLoginSchema = zod_1.z.object({
+    email: zod_1.z.string().email("Invalid email format").max(50, "Email should not exceed 50 characters"),
+    password: zod_1.z.string().min(6, "Password must be at least 6 characters"),
+});
+exports.zodRefreshTokenSchema = zod_1.z.object({
+    refreshToken: zod_1.z.string().min(10, "Refresh token required"),
 });
