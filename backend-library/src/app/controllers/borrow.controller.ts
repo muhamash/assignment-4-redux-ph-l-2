@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Books } from '../models/books.model';
 import { Borrow } from '../models/borrow.model';
-import { isZodError } from '../utils/helpers';
-import { zodBorrowSchema } from '../utils/zods';
+import { isZodError } from '../utils/helpers.util';
+import { zodBorrowSchema } from '../utils/zods.util';
 
 export const borrowABook = async ( req: Request, res: Response ): Promise<void> =>
 {

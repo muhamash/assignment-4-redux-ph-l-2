@@ -109,3 +109,18 @@ export const zodFilterSchema = z.object( {
     sort: z.enum( [ "asc", "desc" ] ).optional(),
     limit: z.string().transform( Number ).default("10").optional(),
 } );
+
+export const zodUser = z.object( {
+    name: z.string().min( 1, "Name is required and must be at least 1 character" ).max( 20, "Name should not exceed 20 characters" ),
+    email: z.string().email( "Invalid email format" ).max( 50, "Email should not exceed 50 characters" ),
+    password: z.string().min( 6, "Password must be at least 6 characters" ).max( 128, "Password should not exceed 128 characters" ),
+} );
+
+export const zodLogin = z.object( {
+    email: z.string().email( "Invalid email format" ).max( 50, "Email should not exceed 50 characters" ),
+    password: z.string().min( 6, "Password must be at least 6 characters" ),
+} );
+
+export const zodRefreshToken = z.object( {
+    refreshToken: z.string().min( 10, "Refresh token required" ),
+} );  

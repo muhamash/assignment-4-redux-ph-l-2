@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { Books } from '../models/books.model';
-import { isZodError } from '../utils/helpers';
-import { zodBookSchema, zodFilterSchema, zodUpdateBookSchema } from "../utils/zods";
+import { isZodError } from '../utils/helpers.util';
+import { zodBookSchema, zodFilterSchema, zodUpdateBookSchema } from "../utils/zods.util";
 
 export const createBook = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
 {

@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { home } from './controllers/home.controller';
+import { authRouter } from './routes/auth.route';
 import { booksRouter } from './routes/books.route';
 import { borrowRouter } from './routes/borrow.route';
 
@@ -23,6 +24,7 @@ app.use( express.json() );
 app.get( "/", home );
 app.use( "/api/books", booksRouter );
 app.use( "/api/borrow", borrowRouter );
+app.use( "/api/auth" , authRouter);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.status(404).json({ message: "Route not found" })
