@@ -1,8 +1,9 @@
 import { createBrowserRouter } from 'react-router';
-import Home from '../pages/Home';
-import Books from '../pages/Books';
-import Login from '../pages/Login';
 import App from '../../App';
+import Books from '../pages/Books';
+import Home from '../pages/Home';
+import Login from '../pages/Login';
+import NotFound from '../pages/NotFound';
 import Register from '../pages/Register';
 
 export const appRouter = createBrowserRouter( [
@@ -31,5 +32,9 @@ export const appRouter = createBrowserRouter( [
     {
         path: '/register',
         Component: Register
+    },
+    {
+        path: "*",
+        Component: NotFound
     }
 ] );

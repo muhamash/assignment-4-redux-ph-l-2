@@ -1,3 +1,4 @@
+import type { RootState } from "@reduxjs/toolkit/query";
 import { Book, LogIn, LogOut, UserPlus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
@@ -5,10 +6,10 @@ import { logout } from "../redux/features/auth/authSlice";
 import { Button } from "../ui/button";
 
 const Nav = () => {
-    const user = useAppSelector( ( state ) => state.auth.user );
+    const user = useAppSelector( ( state: RootState ) => state.auth.user );
     const dispatch = useAppDispatch();
 
-    console.log(user)
+    // console.log(user)
 
     const navigate = useNavigate();
 
@@ -24,7 +25,7 @@ const Nav = () => {
                 <div className="flex justify-between items-center h-16">
                     <Link to="/" className="flex items-center space-x-2">
                         <Book className="h-8 w-8 text-primary" />
-                        <span className="text-xl font-bold text-foreground">LibraryMS</span>
+                        <span className="md:text-xl text-md font-bold text-foreground">LibraryMS</span>
                     </Link>
 
                     <div className="hidden md:flex items-center space-x-6">
