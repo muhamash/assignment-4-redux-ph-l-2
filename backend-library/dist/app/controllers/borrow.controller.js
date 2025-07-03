@@ -13,10 +13,14 @@ const borrowABook = async (req, res) => {
             ...req.body,
             user: req.user.id
         });
+        // console.log(zodBook)
         const updatedBook = await books_model_1.Books.adjustCopiesAfterBorrow(zodBook.book, zodBook.quantity);
         console.log("Validated Borrow Data:", zodBook, updatedBook);
         if (updatedBook) {
-            const borrowedBook = await borrow_model_1.Borrow.create(req.body);
+            const borrowedBook = await borrow_model_1.Borrow.create({
+                ...req.body,
+                user: req.user.id
+            });
             res.status(200).json({
                 success: true,
                 message: "Book borrowed successfully",
@@ -89,12 +93,30 @@ exports.borrowABook = borrowABook;
 const BorrowBooksSummary = async (req, res) => {
     try {
         const summary = await borrow_model_1.Borrow.aggregate([
+            // First group by book + user to get per-user quantity
             {
                 $group: {
-                    _id: '$book',
-                    totalQuantity: { $sum: '$quantity' },
+                    _id: {
+                        book: '$book',
+                        user: '$user'
+                    },
+                    userQuantity: { $sum: '$quantity' }
                 }
             },
+            // Group again by book to gather all users
+            {
+                $group: {
+                    _id: '$_id.book',
+                    totalQuantity: { $sum: '$userQuantity' },
+                    users: {
+                        $push: {
+                            userId: '$_id.user',
+                            quantity: '$userQuantity'
+                        }
+                    }
+                }
+            },
+            // Lookup book details
             {
                 $lookup: {
                     from: 'books',
@@ -103,9 +125,17 @@ const BorrowBooksSummary = async (req, res) => {
                     as: 'bookDetails'
                 }
             },
+            { $unwind: '$bookDetails' },
+            // Lookup user details
             {
-                $unwind: '$bookDetails'
+                $lookup: {
+                    from: 'users',
+                    localField: 'users.userId',
+                    foreignField: '_id',
+                    as: 'userDetails'
+                }
             },
+            // Map user info
             {
                 $project: {
                     _id: 0,
@@ -114,9 +144,56 @@ const BorrowBooksSummary = async (req, res) => {
                         isbn: '$bookDetails.isbn'
                     },
                     totalQuantity: 1,
+                    users: {
+                        $map: {
+                            input: '$users',
+                            as: 'u',
+                            in: {
+                                id: '$$u.userId',
+                                quantity: '$$u.quantity',
+                                // find user detail matching userId
+                                name: {
+                                    $arrayElemAt: [
+                                        {
+                                            $map: {
+                                                input: {
+                                                    $filter: {
+                                                        input: '$userDetails',
+                                                        as: 'ud',
+                                                        cond: { $eq: ['$$ud._id', '$$u.userId'] }
+                                                    }
+                                                },
+                                                as: 'match',
+                                                in: '$$match.name'
+                                            }
+                                        },
+                                        0
+                                    ]
+                                },
+                                email: {
+                                    $arrayElemAt: [
+                                        {
+                                            $map: {
+                                                input: {
+                                                    $filter: {
+                                                        input: '$userDetails',
+                                                        as: 'ud',
+                                                        cond: { $eq: ['$$ud._id', '$$u.userId'] }
+                                                    }
+                                                },
+                                                as: 'match',
+                                                in: '$$match.email'
+                                            }
+                                        },
+                                        0
+                                    ]
+                                }
+                            }
+                        }
+                    }
                 }
             }
-        ]).populate("user", "name email id");
+        ]);
         if (summary.length === 0) {
             res.status(404).json({
                 success: false,

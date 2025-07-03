@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { Books } from "../models/books.model";
+import { AuthenticatedRequest } from "../interfaces/authRequest.interface";
 
-export const preventOwnBorrow = async ( req: Request, res: Response, next: NextFunction ) =>
+export const preventOwnBorrow = async ( req: AuthenticatedRequest, res: Response, next: NextFunction ) =>
 {
     try
     {

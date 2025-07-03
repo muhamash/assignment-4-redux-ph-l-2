@@ -8,6 +8,6 @@ authRouter.post( "/register", createUser );
 
 authRouter.post( "/login", login );
 
-authRouter.post( "/refresh-token", verifyAccessToken, refreshToken );
+authRouter.post( "/refresh-token", refreshToken );
 
-authRouter.post( "/logout", verifyAccessToken, logoutUser );
+authRouter.post( "/logout", logoutUser );

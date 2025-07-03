@@ -47,15 +47,17 @@ userSchema.pre("validate", function (next) {
     next();
 });
 userSchema.pre("save", async function (next) {
-    const user = this;
-    if (!user.isModified("password"))
+    if (!this.isModified("password"))
         return next();
-    user.password = await bcryptjs_1.default.hash(user.password, 10);
+    this.password = await bcryptjs_1.default.hash(this.password, 10);
     next();
 });
-userSchema.pre("remove", async function (next) {
-    const Session = require("./session.model");
-    await Session.deleteMany({ user: this._id });
+userSchema.pre("findOneAndDelete", async function (next) {
+    const docToDelete = await this.model.findOne(this.getFilter());
+    if (docToDelete) {
+        const Session = require("./session.model");
+        await Session.deleteMany({ user: docToDelete._id });
+    }
     next();
 });
 exports.User = (0, mongoose_1.model)("User", userSchema);

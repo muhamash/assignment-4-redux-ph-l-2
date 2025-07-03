@@ -53,7 +53,7 @@ export const createUser = async ( req: Request, res: Response, next: NextFunctio
     }
 }
 
-export const login = async ( req: Request, res: Response, next: NextFunction ) =>
+export const login = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
 {
     try
     {
@@ -137,7 +137,7 @@ export const login = async ( req: Request, res: Response, next: NextFunction ) =
     }
 }
 
-export const refreshToken = async ( req: Request, res: Response, next: NextFunction ) =>
+export const refreshToken = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
 {
     try
     {
@@ -209,7 +209,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
     }
 };
   
-export const logoutUser = async ( req, res ) =>
+export const logoutUser = async ( req, res ): Promise<void> =>
 {
     const { refreshToken } = await zodRefreshTokenSchema.parseAsync( {
         refreshToken: req.cookies.refreshToken,
@@ -218,7 +218,7 @@ export const logoutUser = async ( req, res ) =>
     const session = await Session.findOne( { refreshToken } );
     if ( !session ) return res.status( 403 ).json( { message: "Invalid session", status: 403 } );
   
-    await Session.findOneAndDelete( { refreshToken: token } );
+    // await Session.findOneAndDelete( { refreshToken } );
   
     res.clearCookie( "refreshToken", {
         httpOnly: true,
@@ -226,5 +226,5 @@ export const logoutUser = async ( req, res ) =>
         sameSite: "strict",
     } );
   
-    res.status( 204 );
+    res.status( 204 ).send();
 };  

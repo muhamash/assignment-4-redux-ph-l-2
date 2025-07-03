@@ -187,12 +187,12 @@ const logoutUser = async (req, res) => {
     const session = await session_model_1.Session.findOne({ refreshToken });
     if (!session)
         return res.status(403).json({ message: "Invalid session", status: 403 });
-    await session_model_1.Session.findOneAndDelete({ refreshToken: token });
+    // await Session.findOneAndDelete( { refreshToken } );
     res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: true,
         sameSite: "strict",
     });
-    res.status(204);
+    res.status(204).send();
 };
 exports.logoutUser = logoutUser;

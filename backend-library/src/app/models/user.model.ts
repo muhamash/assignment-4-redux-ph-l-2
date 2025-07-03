@@ -1,6 +1,9 @@
 import bcrypt from "bcryptjs";
-import { Schema, model } from "mongoose";
+import { Document, Schema, model } from "mongoose";
+
 import { IUser } from "../interfaces/user.interface";
+
+type NextFunction = (err?: any) => void;
 
 const userSchema = new Schema<IUser>(
   {
@@ -50,17 +53,22 @@ userSchema.pre("validate", function (next) {
   next();
 });
 
-userSchema.pre("save", async function (next) {
-  const user = this as IUser;
-  if (!user.isModified("password")) return next();
-  user.password = await bcrypt.hash(user.password, 10);
+userSchema.pre( "save", async function ( this: Document & IUser, next: NextFunction )
+{
+  if ( !this.isModified( "password" ) ) return next();
+  this.password = await bcrypt.hash( this.password, 10 );
   next();
-});
+} );
 
-userSchema.pre("delete", async function (next) {
-  const Session = require("./session.model");
-  await Session.deleteMany({ user: this._id });
+userSchema.pre( "findOneAndDelete", async function ( next )
+{
+  const docToDelete = await this.model.findOne( this.getFilter() );
+  if ( docToDelete )
+  {
+    const Session = require( "./session.model" );
+    await Session.deleteMany( { user: docToDelete._id } );
+  }
   next();
-});
+} );
 
 export const User = model<IUser>("User", userSchema);

@@ -29,7 +29,8 @@ sessionSchema.pre("save", async function (next) {
   }
 
   // Prevent duplicate active sessions (single device policy)
-  const existing = await this.constructor.findOne({ user: this.user });
+  const existing = await ( this.constructor as typeof Session ).findOne( { user: this.user } );
+  
   if (existing) {
     await existing.deleteOne();
   }

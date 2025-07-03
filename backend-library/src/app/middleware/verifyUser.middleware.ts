@@ -11,7 +11,7 @@ export const verifyAccessToken = (
 {
     try
     {
-        const authHeader = req.headers.authorization;
+        const authHeader = req.headers.authorization as string | undefined;
 
         if ( !authHeader || !authHeader.startsWith( "Bearer " ) )
         {
