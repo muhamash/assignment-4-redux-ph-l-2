@@ -1,15 +1,14 @@
-import { Button } from "./components/ui/button"
+import React from 'react'
+import { Outlet } from 'react-router';
+import Nav from './components/layouts/Nav';
+import Footer from './components/layouts/Footer';
 
-function App() {
-
-  return (
-    <div className="">
-      hello
-      <Button variant={"default"}>
-        First button
-      </Button>
-    </div>
-  )
+export default function App() {
+    return (
+        <div className="min-h-screen bg-background">
+            <Nav />
+            <Outlet />
+            <Footer />
+        </div>
+    );
 }
-
-export default App
