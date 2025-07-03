@@ -1,5 +1,5 @@
 import React from "react";
-import type { FormFieldContextValue, FormItemContextValue } from "../types/form.types";
+import type { FormFieldContextValue, FormItemContextValue } from "../types/form.type";
 
 
 export const FormFieldContext = React.createContext<FormFieldContextValue>(

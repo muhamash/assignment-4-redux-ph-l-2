@@ -1,9 +1,23 @@
-import { Book, LogIn, UserPlus } from 'lucide-react';
-import { Link } from 'react-router';
-import { Button } from '../ui/button';
+import { Book, LogIn, LogOut, UserPlus } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
+import { logout } from "../redux/features/auth/authSlice";
+import { Button } from "../ui/button";
 
-const Nav = () =>
-{
+const Nav = () => {
+    const user = useAppSelector( ( state ) => state.auth.user );
+    const dispatch = useAppDispatch();
+
+    console.log(user)
+
+    const navigate = useNavigate();
+
+    const handleLogout = () =>
+    {
+        dispatch( logout() );
+        navigate('/')
+    };
+
     return (
         <nav className="bg-slate-200 backdrop-blur-sm border-b border-border sticky top-0 z-50">
             <div className="container mx-auto px-4">
@@ -12,7 +26,7 @@ const Nav = () =>
                         <Book className="h-8 w-8 text-primary" />
                         <span className="text-xl font-bold text-foreground">LibraryMS</span>
                     </Link>
-            
+
                     <div className="hidden md:flex items-center space-x-6">
                         <Link to="/books" className="text-muted-foreground hover:text-foreground transition-colors">
                             All Books
@@ -21,23 +35,35 @@ const Nav = () =>
                             Add Book
                         </Link>
                         <Link to="/borrow-summary" className="text-muted-foreground hover:text-foreground transition-colors">
-                        Borrow Summary
+                            Borrow Summary
                         </Link>
                     </div>
-            
+
                     <div className="flex items-center space-x-3">
-                        <Link to="/login">
-                            <Button variant="ghost" size="sm">
-                                <LogIn className="h-4 w-4 mr-2" />
-                                Sign In
-                            </Button>
-                        </Link>
-                        <Link to="/register">
-                            <Button variant="outline" size="sm">
-                                <UserPlus className="h-4 w-4 mr-2" />
-                                Sign Up
-                            </Button>
-                        </Link>
+                        {!user ? (
+                            <>
+                                <Link to="/login">
+                                    <Button variant="ghost" size="sm">
+                                        <LogIn className="h-4 w-4 mr-2" />
+                                        Sign In
+                                    </Button>
+                                </Link>
+                                <Link to="/register">
+                                    <Button variant="outline" size="sm">
+                                        <UserPlus className="h-4 w-4 mr-2" />
+                                        Sign Up
+                                    </Button>
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <span className="text-muted-foreground">Hello, {user.name}</span>
+                                <Button variant="outline" size="sm" onClick={handleLogout}>
+                                    <LogOut className="h-4 w-4 mr-2" />
+                                    Logout
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

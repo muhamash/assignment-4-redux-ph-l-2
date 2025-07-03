@@ -3,8 +3,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { loginSchema, registerSchema } from "../../../lib/zod";
+import { useAppDispatch } from "../../hooks/useRedux";
 import { useLoginMutation, useRegisterMutation } from "../../redux/api/auth.api";
-import type { ApiError, AuthFormInterface, AuthFormValues, LoginValues, RegisterValues } from "../../types/form.types";
+import { getCredentials } from "../../redux/features/auth/authSlice";
+import type { User } from "../../types/auth.type";
+import type { ApiError, AuthFormInterface, AuthFormValues, LoginValues, RegisterValues } from "../../types/form.type";
 import { Button } from "../../ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../ui/form";
 import { Input } from "../../ui/input";
@@ -17,6 +20,7 @@ export default function AuthForm({ mode }: AuthFormInterface) {
   const [ register, { data: regData, isLoading: isRegisterLoading, error: regError } ] = useRegisterMutation();
   
   console.log(JSON.stringify(regError), loginError, regData, loginData)
+  const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
 
@@ -36,12 +40,15 @@ export default function AuthForm({ mode }: AuthFormInterface) {
       if ( isRegister )
       {
         await register( values as RegisterValues ).unwrap();
+
         toast.success( "Registered successfully! Please log in." );
         navigate( "/login" );
       }
       else
       {
-        await login( values as LoginValues ).unwrap();
+        const res = await login( values as LoginValues ).unwrap();
+        dispatch( getCredentials( { user: res?.data as User, accessToken: res?.data?.accessToken as string } ) );
+
         toast.success( "Logged in successfully!" );
         navigate( "/" );
       }

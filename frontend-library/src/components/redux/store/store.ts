@@ -1,12 +1,32 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { persistReducer, persistStore } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import { authApi } from '../api/auth.api';
+import { booksApi } from '../api/books.api';
+import authReducer from '../features/auth/authSlice';
+
+const persistConfig = {
+    key: 'auth',
+    storage,
+    whitelist: [ 'user', 'accessToken' ],
+};
+
+const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 
 export const store = configureStore( {
     reducer: {
-        [authApi.reducerPath] : authApi.reducer,
+        auth: persistedAuthReducer,
+        [ authApi.reducerPath ]: authApi.reducer,
+        [booksApi.reducerPath] : booksApi.reducer,
     },
-    middleware:(getDefaultMiddleware)=> getDefaultMiddleware().concat(authApi.middleware)
+    middleware: ( getDefaultMiddleware ) =>
+        getDefaultMiddleware( {
+            serializableCheck: {
+                ignoredActions: [ 'persist/PERSIST' ],
+            },
+        } ).concat( authApi.middleware, booksApi.middleware ),
 } );
 
+export const persistor = persistStore(store);
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
