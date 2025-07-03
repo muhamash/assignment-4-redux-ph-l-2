@@ -11,17 +11,17 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 exports.__esModule = true;
+var cookie_parser_1 = require("cookie-parser");
 var cors_1 = require("cors");
 var express_1 = require("express");
 var home_controller_1 = require("./controllers/home.controller");
 var auth_route_1 = require("./routes/auth.route");
 var books_route_1 = require("./routes/books.route");
 var borrow_route_1 = require("./routes/borrow.route");
-var cookie_parser_1 = require("cookie-parser");
 var app = express_1["default"]();
 app.use(cookie_parser_1["default"]());
 app.use(cors_1["default"]({
-    origin: ["http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app"],
+    origin: ["http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app", "https://assignment-4-redux-ph-l-2-ideh.vercel.app"],
     credentials: true
 }));
 app.use(express_1["default"].json({ type: '*/*' }));

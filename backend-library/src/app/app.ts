@@ -1,17 +1,17 @@
+import cookieParser from "cookie-parser";
 import cors from 'cors';
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { home } from './controllers/home.controller';
 import { authRouter } from './routes/auth.route';
 import { booksRouter } from './routes/books.route';
 import { borrowRouter } from './routes/borrow.route';
-import cookieParser from "cookie-parser";
 
 
 const app: Application = express()
 
 app.use(cookieParser());
 app.use( cors( {
-    origin: ["http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app"],
+    origin: ["http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app", "https://assignment-4-redux-ph-l-2-ideh.vercel.app"],
     credentials: true
 } ) );
 app.use( express.json( { type: '*/*' } ) );
