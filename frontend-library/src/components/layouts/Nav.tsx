@@ -1,4 +1,4 @@
-import { Book, Users, BarChart3, BookOpen, Plus, Search, LogIn, UserPlus } from 'lucide-react';
+import { Book, LogIn, UserPlus } from 'lucide-react';
 import { Link } from 'react-router';
 import { Button } from '../ui/button';
 
@@ -33,7 +33,7 @@ const Nav = () =>
                             </Button>
                         </Link>
                         <Link to="/register">
-                            <Button variant="premium" size="sm">
+                            <Button variant="outline" size="sm">
                                 <UserPlus className="h-4 w-4 mr-2" />
                                 Sign Up
                             </Button>

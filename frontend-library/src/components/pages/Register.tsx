@@ -1,7 +1,6 @@
 import { Book } from 'lucide-react';
-import React from 'react';
+// import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card';
-import { Button } from '../ui/button';
 import { Link } from 'react-router';
 import AuthForm from '../module/auth/AuthForm';
 

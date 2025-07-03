@@ -1,4 +1,4 @@
-import React from 'react'
+// import React from 'react'
 import { Outlet } from 'react-router';
 import Nav from './components/layouts/Nav';
 import Footer from './components/layouts/Footer';

@@ -1,15 +1,13 @@
-import { Input } from "../../ui/input";
-import { Button } from "../../ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "../../ui/form";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import type { AuthFormInterface } from "../../types/FormTypes";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import { loginSchema, registerSchema } from "../../../lib/zod";
 import { useLoginMutation, useRegisterMutation } from "../../redux/api/auth.api";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { toast } from "react-hot-toast";
+import type { ApiError, AuthFormInterface, AuthFormValues, LoginValues, RegisterValues } from "../../types/form.types";
+import { Button } from "../../ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../ui/form";
+import { Input } from "../../ui/input";
 
 export default function AuthForm({ mode }: AuthFormInterface) {
   const isRegister = mode === "register";
@@ -18,11 +16,11 @@ export default function AuthForm({ mode }: AuthFormInterface) {
   const [login, { data: loginData, isLoading: isLoginLoading, error: loginError }] = useLoginMutation();
   const [ register, { data: regData, isLoading: isRegisterLoading, error: regError } ] = useRegisterMutation();
   
-  // console.log(JSON.stringify(regError), loginError, regData, loginData)
+  console.log(JSON.stringify(regError), loginError, regData, loginData)
 
   const navigate = useNavigate();
 
-  const form = useForm<z.infer<typeof schema>>({
+  const form = useForm<AuthFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       email: "",
@@ -31,30 +29,36 @@ export default function AuthForm({ mode }: AuthFormInterface) {
     },
   });
 
-  const onSubmit = async ( values: z.infer<typeof schema> ) =>
+  const onSubmit = async ( values: LoginValues | RegisterValues ) =>
   {
     try
     {
       if ( isRegister )
       {
-        await register( values ).unwrap();
+        await register( values as RegisterValues ).unwrap();
         toast.success( "Registered successfully! Please log in." );
         navigate( "/login" );
       }
       else
       {
-        await login( values ).unwrap();
+        await login( values as LoginValues ).unwrap();
         toast.success( "Logged in successfully!" );
         navigate( "/" );
       }
     }
-    catch ( error: any )
+    catch (error: unknown)
     {
-      console.error( "Error:", error );
+      if (error instanceof Error) {
+        console.error("Error:", error.message);
+      } else {
+        console.error("Error:", error);
+      }
     }
   };
 
-  const apiError = (loginError as any)?.data?.message || (regError as any)?.data?.message;
+  const apiError = ( loginError as ApiError )?.data?.message || ( regError as ApiError )?.data?.message;
+  
+  // console.log(apiError)
 
   return (
     <Form {...form}>
@@ -62,7 +66,7 @@ export default function AuthForm({ mode }: AuthFormInterface) {
         {isRegister && (
           <FormField
             control={form.control}
-            name="name"
+            name={"name" as const}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Name</FormLabel>
