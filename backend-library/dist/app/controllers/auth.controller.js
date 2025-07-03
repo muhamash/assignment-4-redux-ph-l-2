@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logoutUser = exports.refreshToken = exports.login = exports.createUser = void 0;
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const session_model_1 = require("../models/session.model");
 const user_model_1 = require("../models/user.model");
 const helpers_util_1 = require("../utils/helpers.util");
-const zods_util_1 = require("../utils/zods.util");
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jwt_util_1 = require("../utils/jwt.util");
-const session_model_1 = require("../models/session.model");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const zods_util_1 = require("../utils/zods.util");
 const createUser = async (req, res, next) => {
     try {
         const zodUser = await zods_util_1.zodUserSchema.parseAsync(req.body);
@@ -55,17 +55,19 @@ const login = async (req, res, next) => {
         const zodLogin = await zods_util_1.zodLoginSchema.parseAsync(req.body);
         const user = await user_model_1.User.findOne({ email: zodLogin.email });
         if (!user) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: "User not found",
             });
+            return;
         }
         const verifyUser = await bcryptjs_1.default.compare(zodLogin.password, user.password);
         if (!verifyUser) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
                 message: "Invalid credentials",
             });
+            return;
         }
         const accessToken = (0, jwt_util_1.generateAccessToken)(user.id);
         const refreshToken = (0, jwt_util_1.generateRefreshToken)(user.id);
@@ -123,14 +125,17 @@ exports.login = login;
 const refreshToken = async (req, res, next) => {
     try {
         if (!req.cookies || !req.cookies.refreshToken) {
-            return res.status(401).json({ message: "No refresh token found in cookies" });
+            res.status(401).json({ message: "No refresh token found in cookies" });
+            return;
         }
         const { refreshToken } = await zods_util_1.zodRefreshTokenSchema.parseAsync({
             refreshToken: req.cookies.refreshToken,
         });
         const session = await session_model_1.Session.findOne({ refreshToken });
-        if (!session)
-            return res.status(403).json({ message: "Invalid session", status: 403 });
+        if (!session) {
+            res.status(403).json({ message: "Invalid session", status: 403 });
+            return;
+        }
         const payload = jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
         const newAccessToken = (0, jwt_util_1.generateAccessToken)(payload.id);
         const newRefreshToken = (0, jwt_util_1.generateRefreshToken)(payload.id);
@@ -180,13 +185,15 @@ const refreshToken = async (req, res, next) => {
     }
 };
 exports.refreshToken = refreshToken;
-const logoutUser = async (req, res) => {
+const logoutUser = async (req, res, next) => {
     const { refreshToken } = await zods_util_1.zodRefreshTokenSchema.parseAsync({
         refreshToken: req.cookies.refreshToken,
     });
     const session = await session_model_1.Session.findOne({ refreshToken });
-    if (!session)
-        return res.status(403).json({ message: "Invalid session", status: 403 });
+    if (!session) {
+        res.status(403).json({ message: "Invalid session", status: 403 });
+        return;
+    }
     // await Session.findOneAndDelete( { refreshToken } );
     res.clearCookie("refreshToken", {
         httpOnly: true,

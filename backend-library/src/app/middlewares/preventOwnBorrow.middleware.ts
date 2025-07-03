@@ -1,29 +1,33 @@
-import { Request, Response, NextFunction } from "express";
-import { Books } from "../models/books.model";
+import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../interfaces/authRequest.interface";
+import { Books } from "../models/books.model";
 
 export const preventOwnBorrow = async ( req: AuthenticatedRequest, res: Response, next: NextFunction ) =>
 {
     try
     {
         const bookId = req.body.book;
-        const userId = req.user.id;
+        const userId = req.user?.id;
 
         
         const book = await Books.findById( bookId );
 
         if ( !book )
         {
-            return res.status( 404 ).json( { message: "Book not found", success: false, data: null } );
+            res.status( 404 ).json( { message: "Book not found", success: false, data: null } );
+
+            return
         }
 
         // console.log( book );
-        if ( book.createdBy.toString() === userId )
+        if ( book?.createdBy?.toString() === userId )
         {
-            return res.status( 400 ).json( {
+            res.status( 400 ).json( {
                 message: "You cannot borrow your own book",
                 success: false
             } );
+
+            return
         }
 
         next();

@@ -1,6 +1,5 @@
 import express from "express";
 import { createUser, login, logoutUser, refreshToken } from "../controllers/auth.controller";
-import { verifyAccessToken } from "../middleware/verifyUser.middleware";
 
 export const authRouter = express.Router();
 

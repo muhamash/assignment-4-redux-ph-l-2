@@ -1,11 +1,11 @@
+import bcrypt from "bcryptjs";
 import { NextFunction, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { Session } from '../models/session.model';
 import { User } from '../models/user.model';
 import { isZodError } from '../utils/helpers.util';
-import { zodLoginSchema, zodRefreshTokenSchema, zodUserSchema } from '../utils/zods.util';
-import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt.util';
-import { Session } from '../models/session.model';
-import jwt from 'jsonwebtoken';
+import { zodLoginSchema, zodRefreshTokenSchema, zodUserSchema } from '../utils/zods.util';
 
 export const createUser = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
 {
@@ -62,19 +62,23 @@ export const login = async ( req: Request, res: Response, next: NextFunction ): 
         const user = await User.findOne( { email: zodLogin.email } );
         if ( !user )
         {
-            return res.status( 404 ).json( {
+            res.status( 404 ).json( {
                 success: false,
                 message: "User not found",
             } );
+
+            return;
         }
 
         const verifyUser = await bcrypt.compare( zodLogin.password, user.password )
         if ( !verifyUser ) 
         {
-            return res.status( 401 ).json( {
+            res.status( 401 ).json( {
                 success: false,
                 message: "Invalid credentials",
             } );
+
+            return
         }
 
         const accessToken = generateAccessToken( user.id );
@@ -143,7 +147,9 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
     {
         if ( !req.cookies || !req.cookies.refreshToken )
         {
-            return res.status( 401 ).json( { message: "No refresh token found in cookies" } );
+            res.status( 401 ).json( { message: "No refresh token found in cookies" } );
+            
+            return
         }
   
         const { refreshToken } = await zodRefreshTokenSchema.parseAsync( {
@@ -151,7 +157,12 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
         } );
   
         const session = await Session.findOne( { refreshToken } );
-        if ( !session ) return res.status( 403 ).json( { message: "Invalid session", status: 403 } );
+        if ( !session )
+        {
+            res.status( 403 ).json( { message: "Invalid session", status: 403 } );
+
+            return
+        }
   
         const payload = jwt.verify( refreshToken, process.env.REFRESH_TOKEN_SECRET! ) as any;
   
@@ -209,14 +220,19 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
     }
 };
   
-export const logoutUser = async ( req, res ): Promise<void> =>
+export const logoutUser = async ( req: Request, res: Response, next: NextFunction ): Promise<void> =>
 {
     const { refreshToken } = await zodRefreshTokenSchema.parseAsync( {
         refreshToken: req.cookies.refreshToken,
     } );
 
     const session = await Session.findOne( { refreshToken } );
-    if ( !session ) return res.status( 403 ).json( { message: "Invalid session", status: 403 } );
+    if ( !session )
+    {
+        res.status( 403 ).json( { message: "Invalid session", status: 403 } );
+
+        return
+    }
   
     // await Session.findOneAndDelete( { refreshToken } );
   

@@ -1,6 +1,6 @@
 import express from 'express';
 import { createBook, deleteBook, getBookById, getBooks, updateBook } from '../controllers/books.controller';
-import { verifyAccessToken } from '../middleware/verifyUser.middleware';
+import { verifyAccessToken } from '../middlewares/verifyUser.middleware';
 
 export const booksRouter = express.Router();
 

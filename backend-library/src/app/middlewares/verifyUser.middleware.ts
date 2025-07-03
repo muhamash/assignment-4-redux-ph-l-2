@@ -15,10 +15,12 @@ export const verifyAccessToken = (
 
         if ( !authHeader || !authHeader.startsWith( "Bearer " ) )
         {
-            return res.status( 401 ).json( {
+            res.status( 401 ).json( {
                 message: "No token provided",
                 success: false,
             } );
+
+            return
         }
 
         const token = authHeader.split( " " )[ 1 ];
@@ -29,9 +31,11 @@ export const verifyAccessToken = (
         next();
     } catch ( error )
     {
-        return res.status( 401 ).json( {
+        res.status( 401 ).json( {
             message: "Invalid or expired token",
             success: false,
         } );
+
+        return
     }
 };

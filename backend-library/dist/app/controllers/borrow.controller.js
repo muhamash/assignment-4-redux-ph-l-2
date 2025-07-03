@@ -11,7 +11,7 @@ const borrowABook = async (req, res) => {
         // console.log( "Request Body:", req.body );
         const zodBook = await zods_util_1.zodBorrowSchema.parseAsync({
             ...req.body,
-            user: req.user.id
+            user: req.user?.id
         });
         // console.log(zodBook)
         const updatedBook = await books_model_1.Books.adjustCopiesAfterBorrow(zodBook.book, zodBook.quantity);
@@ -19,7 +19,7 @@ const borrowABook = async (req, res) => {
         if (updatedBook) {
             const borrowedBook = await borrow_model_1.Borrow.create({
                 ...req.body,
-                user: req.user.id
+                user: req.user?.id
             });
             res.status(200).json({
                 success: true,

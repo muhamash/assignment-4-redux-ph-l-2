@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
+import { AuthenticatedRequest } from '../interfaces/authRequest.interface';
 import { Books } from '../models/books.model';
 import { isZodError } from '../utils/helpers.util';
 import { zodBookSchema, zodFilterSchema, zodUpdateBookSchema } from "../utils/zods.util";
-import { AuthenticatedRequest } from '../interfaces/authRequest.interface';
 
 export const createBook = async ( req: AuthenticatedRequest, res: Response, next: NextFunction ): Promise<void> =>
 {
@@ -178,7 +178,7 @@ export const getBookById = async ( req: Request, res: Response, next: NextFuncti
     }
 };
 
-export const updateBook = async ( req: AuthenticatedRequest, res: Response, next: NextFunction ): Promise<void> =>
+export const updateBook = async ( req: AuthenticatedRequest<{id: string}>, res: Response, next: NextFunction ): Promise<void> =>
 {
     try
     {
@@ -238,11 +238,12 @@ export const updateBook = async ( req: AuthenticatedRequest, res: Response, next
     }
 }   
 
-export const deleteBook = async ( req: AuthenticatedRequest, res: Response, next: NextFunction ): Promise<void> =>
+export const deleteBook = async ( req: AuthenticatedRequest<{id: string}>, res: Response, next: NextFunction ): Promise<void> =>
 {
     try
     {
         const bookId = req.params?.id;
+        // const bookId = (req.params as { id: string }).id;
         // console.log("deleteBook controller called with ID:", bookId);
         
         const book = await Books.findByIdAndDelete( bookId );

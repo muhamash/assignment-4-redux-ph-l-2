@@ -196,6 +196,7 @@ exports.updateBook = updateBook;
 const deleteBook = async (req, res, next) => {
     try {
         const bookId = req.params?.id;
+        // const bookId = (req.params as { id: string }).id;
         // console.log("deleteBook controller called with ID:", bookId);
         const book = await books_model_1.Books.findByIdAndDelete(bookId);
         if (!book) {

@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
+import { AuthenticatedRequest } from '../interfaces/authRequest.interface';
 import { Books } from '../models/books.model';
 import { Borrow } from '../models/borrow.model';
 import { isZodError } from '../utils/helpers.util';
 import { zodBorrowSchema } from '../utils/zods.util';
 
-export const borrowABook = async ( req: Request, res: Response ): Promise<void> =>
+export const borrowABook = async ( req: AuthenticatedRequest, res: Response ): Promise<void> =>
 {
     // console.log( "borrowABook controller called" );
     try
@@ -12,7 +13,7 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
         // console.log( "Request Body:", req.body );
         const zodBook = await zodBorrowSchema.parseAsync( {
             ...req.body,
-            user: req.user.id
+            user: req.user?.id
         } );
 
         // console.log(zodBook)
@@ -25,7 +26,7 @@ export const borrowABook = async ( req: Request, res: Response ): Promise<void> 
         {
             const borrowedBook = await Borrow.create( {
                 ...req.body,
-                user: req.user.id
+                user: req.user?.id
             } );
 
             res.status( 200 ).json( {
