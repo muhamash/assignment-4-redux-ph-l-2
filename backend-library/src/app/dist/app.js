@@ -21,7 +21,7 @@ var cookie_parser_1 = require("cookie-parser");
 var app = express_1["default"]();
 app.use(cookie_parser_1["default"]());
 app.use(cors_1["default"]({
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: ["http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app"],
     credentials: true
 }));
 app.use(express_1["default"].json({ type: '*/*' }));

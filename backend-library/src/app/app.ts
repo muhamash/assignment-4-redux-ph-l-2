@@ -11,7 +11,7 @@ const app: Application = express()
 
 app.use(cookieParser());
 app.use( cors( {
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: ["http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app"],
     credentials: true
 } ) );
 app.use( express.json( { type: '*/*' } ) );
