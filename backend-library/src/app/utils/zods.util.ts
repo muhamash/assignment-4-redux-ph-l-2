@@ -109,7 +109,9 @@ export const zodFilterSchema = z.object( {
         } ).optional(),
     sortBy: z.enum( allowedFiltersProperties ).optional(),
     sort: z.enum( [ "asc", "desc" ] ).optional(),
-    limit: z.string().transform( Number ).default("10").optional(),
+    limit: z.string().transform( Number ).default( "10" ).optional(),
+    userId: z.string().optional(),
+    page:z.string().transform( Number ).default( "1" ).optional()
 } );
 
 export const zodUserSchema = z.object( {

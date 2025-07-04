@@ -6,9 +6,9 @@ const borrow_model_1 = require("../models/borrow.model");
 const helpers_util_1 = require("../utils/helpers.util");
 const zods_util_1 = require("../utils/zods.util");
 const borrowABook = async (req, res) => {
-    // console.log( "borrowABook controller called" );
+    console.log("borrowABook controller called");
     try {
-        // console.log( "Request Body:", req.body );
+        console.log("Request Body:", req.body);
         const zodBook = await zods_util_1.zodBorrowSchema.parseAsync({
             ...req.body,
             user: req.user?.id

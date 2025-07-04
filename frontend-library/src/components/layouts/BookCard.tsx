@@ -28,8 +28,8 @@ export default function BookCard ( { book }: { book: IBook } )
             ( t ) =>
             {
                 return (
-                    <div className="space-y-2">
-                        <p>Are you sure you want to delete this book?</p>
+                    <div className="space-y-2 w-full">
+                        <p className="text-rose-600 text-lg">Are you sure you want to delete this book?</p>
                         <div className="flex gap-2">
                             <Button
                                 size="sm"
@@ -43,7 +43,8 @@ export default function BookCard ( { book }: { book: IBook } )
                                         await deleteBook( bookId ).unwrap();
                                         toast.dismiss( t );
                                         toast.success( "Book deleted successfully" );
-                                    } catch ( error: unknown )
+                                    }
+                                    catch ( error: unknown )
                                     {
                                         toast.dismiss( t );
                                         // Show backend error message if available
@@ -71,8 +72,6 @@ export default function BookCard ( { book }: { book: IBook } )
             }
         );
     };
-
-    // console.log( user.id );
 
     return (
         <Card className="card-shadow transition-smooth hover:shadow-lg">

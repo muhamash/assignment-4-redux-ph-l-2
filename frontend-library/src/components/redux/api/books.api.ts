@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { IBook } from "../../types/books.type";
+import type { BookQueryParams, IBook, IBorrowSummaryItem, ICreateBookInput, IPaginationMeta, IUpdateBookInput } from "../../types/books.type";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -21,16 +21,25 @@ export const booksApi = createApi( {
     } ),
     tagTypes: [ "books", "borrows" ],
     endpoints: ( builder ) => ( {
-        getBooks: builder.query<{ success: true; data: IBook[] }, void>( {
-            query: () => "/books",
-            providesTags: [ "books" ],
-        } ),
+        getBooks: builder.query<{ success: true; data: IBook[]; meta: IPaginationMeta }, BookQueryParams>({
+            query: (params = {}) => {
+                const urlParams = new URLSearchParams();
+                if (params.filter) urlParams.append("filter", params.filter);
+                if (params.sortBy) urlParams.append("sortBy", params.sortBy);
+                if (params.sort) urlParams.append("sort", params.sort);
+                if (params.limit) urlParams.append("limit", params.limit);
+                if (params.page) urlParams.append("page", params.page);
+                if (params.userId) urlParams.append("userId", params.userId);
+        
+                return `/books?${urlParams.toString()}`;
+            },
+        }),        
 
         getBook: builder.query<{ success: true; data: IBook }, string>( {
             query: ( bookId ) => `/books/${ bookId }`,
         } ),
 
-        createBook: builder.mutation<{ success: true; data: IBook }, any>( {
+        createBook: builder.mutation<{ success: true; data: IBook }, ICreateBookInput>( {
             query: ( body ) => ( {
                 url: "/books",
                 method: "POST",
@@ -39,7 +48,7 @@ export const booksApi = createApi( {
             invalidatesTags: [ "books" ],
         } ),
 
-        updateBook: builder.mutation<{ success: true; data: IBook }, { id: string; body: any }>( {
+        updateBook: builder.mutation<{ success: true; data: IBook }, { id: string; body: IUpdateBookInput }>( {
             query: ( { id, body } ) => ( {
                 url: `/books/${ id }`,
                 method: "PUT",
@@ -65,7 +74,7 @@ export const booksApi = createApi( {
             invalidatesTags: [ "books", "borrows" ],
         } ),
       
-        getBorrowSummary: builder.query<{ success: true; data: any[] }, void>( {
+        getBorrowSummary: builder.query<{ success: true; data: IBorrowSummaryItem[] }, void>( {
             query: () => "/borrow/summary",
             providesTags: [ "borrows" ],
         } ),

@@ -57,14 +57,34 @@ const getBooks = async (req, res) => {
         const sortBy = zodBody.sortBy || 'createdAt';
         const sort = zodBody.sort === 'desc' ? -1 : 1;
         const limit = parseInt(zodBody.limit) || 10;
+        const page = parseInt(zodBody.page) | 1;
         // console.log(filter?.toUpperCase())
-        const books = await books_model_1.Books.find(filter ? { genre: filter } : {})
+        const query = {};
+        if (filter) {
+            query.genre = filter;
+        }
+        if (zodBody?.userId) {
+            query.createdBy = zodBody?.userId;
+        }
+        const totalBooks = await books_model_1.Books.countDocuments(query);
+        const skip = (page - 1) * limit;
+        const totalPages = Math.ceil(totalBooks / limit);
+        const books = await books_model_1.Books.find(query)
             .sort({ [sortBy]: sort })
-            .limit(limit).populate("createdBy", "name email id");
+            .skip(skip)
+            .limit(limit)
+            .populate("createdBy", "name email id");
+        // const books = await Books.find( filter ? { genre: filter } : {} )
+        //     .sort( { [ sortBy ]: sort } )
+        //     .limit( limit ).populate("createdBy", "name email id");
         if (!books.length) {
             res.status(404).json({
                 success: false,
-                message: `${filter ? `No books found for genre '${filter}'` : "No books found"}`,
+                message: `${filter
+                    ? `No books found for genre '${filter}'`
+                    : zodBody?.userId
+                        ? `No books found for this user`
+                        : "No books found"}`,
                 data: null,
             });
             return;
@@ -73,6 +93,12 @@ const getBooks = async (req, res) => {
             success: true,
             message: "Books retrieved successfully",
             data: books,
+            meta: {
+                total: totalBooks,
+                page: page,
+                limit: limit,
+                totalPages,
+            },
         });
     }
     catch (error) {

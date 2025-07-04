@@ -1,6 +1,12 @@
 // import React from 'react'
 
-export default function Books() {
+import { useGetBooksQuery } from "../redux/api/books.api";
+
+
+export default function Books ()
+{
+  const { data, isLoading, isError } = useGetBooksQuery();
+  console.log(data)
   return (
     <div>
       Books

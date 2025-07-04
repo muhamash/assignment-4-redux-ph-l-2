@@ -70,21 +70,44 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
         const sortBy = zodBody.sortBy as string || 'createdAt';
         const sort = zodBody.sort === 'desc' ? -1 : 1;
         const limit: number = parseInt( zodBody.limit as any ) || 10;
+        const page: number = parseInt( zodBody.page as any ) | 1;
 
         // console.log(filter?.toUpperCase())
+        const query: any = {};
+        if (filter) {
+            query.genre = filter;
+        }
+        if (zodBody?.userId) {
+            query.createdBy = zodBody?.userId;
+        }
 
-        const books = await Books.find( filter ? { genre: filter } : {} )
+        const totalBooks = await Books.countDocuments( query );
+        const skip = (page - 1) * limit;
+        const totalPages = Math.ceil( totalBooks / limit );
+        
+        const books = await Books.find( query )
             .sort( { [ sortBy ]: sort } )
-            .limit( limit ).populate("createdBy", "name email id");
+            .skip( skip )
+            .limit( limit )
+            .populate( "createdBy", "name email id" );
+
+        // const books = await Books.find( filter ? { genre: filter } : {} )
+        //     .sort( { [ sortBy ]: sort } )
+        //     .limit( limit ).populate("createdBy", "name email id");
 
 
-        if ( !books.length )
-        {
+        if (!books.length) {
             res.status( 404 ).json( {
                 success: false,
-                message: `${ filter ? `No books found for genre '${ filter }'` : "No books found" }`,
+                message: `${ filter
+                        ? `No books found for genre '${ filter }'`
+                        : zodBody?.userId
+                            ? `No books found for this user`
+                            : "No books found"
+                    }`,
                 data: null,
             } );
+            
             return;
         }
 
@@ -92,6 +115,12 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
             success: true,
             message: "Books retrieved successfully",
             data: books,
+            meta: {
+                total: totalBooks,
+                page: page,
+                limit: limit,
+                totalPages,
+            },
         } );
     } catch ( error )
     {
