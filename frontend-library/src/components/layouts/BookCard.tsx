@@ -1,6 +1,6 @@
 import type { RootState } from "@reduxjs/toolkit/query";
 import { Book, Edit, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { openModal } from "../redux/features/books/modalSlice";
 import type { IBook } from "../types/books.type";
@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 export default function BookCard ( { book }: { book: IBook } )
 {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
 
     const user = useAppSelector( ( state: RootState ) => state?.auth?.user );
 
@@ -48,11 +49,6 @@ export default function BookCard ( { book }: { book: IBook } )
                         </Badge>
                     </div>
                 </div>
-
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                    {book.description}
-                </p>
-
                 {/* Actions */}
                 <div className="flex flex-wrap gap-2">
                     {
@@ -81,6 +77,17 @@ export default function BookCard ( { book }: { book: IBook } )
                             onClick={()=> dispatch(openModal(book))}
                         >
                             Borrow
+                        </Button>
+                    </>
+
+                    <>
+                        <Button
+                            className="ml-auto"
+                            variant="link"
+                            size="sm"
+                            onClick={()=> navigate(`/books/${book?.id}`)}
+                        >
+                            View
                         </Button>
                     </>
                 </div>

@@ -1,7 +1,6 @@
 import { Book } from 'lucide-react';
 import { Link } from 'react-router';
 import BookCard from '../../layouts/BookCard';
-import BorrowModal from '../../layouts/BorrowModal';
 import { useGetBooksQuery } from '../../redux/api/books.api';
 import type { IBook } from '../../types/books.type';
 
@@ -55,7 +54,7 @@ export default function Hero() {
                     View More
                 </Link>
             </div>
-            <BorrowModal/>
+            {/* <BorrowModal/> */}
         </section>
     );
 }

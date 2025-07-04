@@ -2,6 +2,7 @@
 import { Outlet } from 'react-router';
 import { Toaster } from 'sonner';
 import { useAutoRefresh } from './components/hooks/useAutoRefresh';
+import BorrowModal from './components/layouts/BorrowModal';
 import Footer from './components/layouts/Footer';
 import Nav from './components/layouts/Nav';
 
@@ -17,7 +18,7 @@ export default function App ()
             <Nav />
             <Outlet />
             <Footer />
-            <Toaster position="top-center" richColors/>
+            <BorrowModal/>
         </div>
     );
 }

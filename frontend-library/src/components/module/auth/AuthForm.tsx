@@ -42,14 +42,18 @@ export default function AuthForm({ mode }: AuthFormInterface) {
         await register( values as RegisterValues ).unwrap();
 
         toast.success( "Registered successfully! Please log in." );
-        navigate( "/login" );
+
+        setTimeout( () =>
+        {
+          navigate( "/login" );
+        }, 1000 );
       }
       else
       {
         const res = await login( values as LoginValues ).unwrap();
+        
         dispatch( getCredentials( { user: res?.data as User, accessToken: res?.data?.accessToken as string } ) );
 
-        toast.success( "Logged in successfully!" );
         navigate( "/" );
       }
     }
