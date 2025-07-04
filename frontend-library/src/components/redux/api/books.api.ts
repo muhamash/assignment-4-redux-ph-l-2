@@ -8,8 +8,18 @@ export const booksApi = createApi( {
     baseQuery: fetchBaseQuery( {
         baseUrl: BASE_URL,
         credentials: "include",
+        prepareHeaders: ( headers, { getState } ) =>
+        {
+            const token = ( getState() as any ).auth.accessToken;
+            // console.log(token)
+            if ( token )
+            {
+                headers.set( "authorization", `Bearer ${ token }` );
+            }
+            return headers;
+        },
     } ),
-    tagTypes: [ "books" , "borrows"],
+    tagTypes: [ "books", "borrows" ],
     endpoints: ( builder ) => ( {
         getBooks: builder.query<{ success: true; data: IBook[] }, void>( {
             query: () => "/books",
@@ -46,7 +56,7 @@ export const booksApi = createApi( {
             invalidatesTags: [ "books" ],
         } ),
 
-        borrowBook: builder.mutation<{ success: true; message: string }, { book: string; quantity: number, user: string, dueDate: string }>( {
+        borrowBook: builder.mutation<{ success: true; message: string }, { book: string; quantity: number, user: string, dueDate: Date }>( {
             query: ( body ) => ( {
                 url: "/borrow",
                 method: "POST",

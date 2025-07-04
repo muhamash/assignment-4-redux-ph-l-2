@@ -1,14 +1,15 @@
 import { Book } from 'lucide-react';
 import { Link } from 'react-router';
+import BookCard from '../../layouts/BookCard';
+import BorrowModal from '../../layouts/BorrowModal';
 import { useGetBooksQuery } from '../../redux/api/books.api';
 import type { IBook } from '../../types/books.type';
-import BookCard from './BookCard';
 
 export default function Hero() {
     const { data, isLoading, isError } = useGetBooksQuery();
 
     const books = data?.data?.slice( 0, 6 ) || [];
-    console.log(books)
+    // console.log(books)
 
     return (
         <section className="bg-sky-800 py-20 flex flex-col items-center justify-center gap-10">
@@ -54,6 +55,7 @@ export default function Hero() {
                     View More
                 </Link>
             </div>
+            <BorrowModal/>
         </section>
     );
 }

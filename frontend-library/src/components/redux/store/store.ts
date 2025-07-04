@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage';
 import { authApi } from '../api/auth.api';
 import { booksApi } from '../api/books.api';
 import authReducer from '../features/auth/authSlice';
+import modalReducer from "../features/books/modalSlice";
 
 const persistConfig = {
     key: 'auth',
@@ -16,6 +17,7 @@ const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 export const store = configureStore( {
     reducer: {
         auth: persistedAuthReducer,
+        modal: modalReducer,
         [ authApi.reducerPath ]: authApi.reducer,
         [booksApi.reducerPath] : booksApi.reducer,
     },

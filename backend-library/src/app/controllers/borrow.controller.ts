@@ -7,10 +7,10 @@ import { zodBorrowSchema } from '../utils/zods.util';
 
 export const borrowABook = async ( req: AuthenticatedRequest, res: Response ): Promise<void> =>
 {
-    // console.log( "borrowABook controller called" );
+    console.log( "borrowABook controller called" );
     try
     {
-        // console.log( "Request Body:", req.body );
+        console.log( "Request Body:", req.body );
         const zodBook = await zodBorrowSchema.parseAsync( {
             ...req.body,
             user: req.user?.id

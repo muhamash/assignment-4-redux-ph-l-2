@@ -1,14 +1,17 @@
 import type { RootState } from "@reduxjs/toolkit/query";
 import { Book, Edit, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAppSelector } from "../../hooks/useRedux";
-import type { IBook } from "../../types/books.type";
-import { Badge } from "../../ui/badge";
-import { Button } from "../../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
+import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
+import { openModal } from "../redux/features/books/modalSlice";
+import type { IBook } from "../types/books.type";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 export default function BookCard ( { book }: { book: IBook } )
 {
+    const dispatch = useAppDispatch();
+
     const user = useAppSelector( ( state: RootState ) => state?.auth?.user );
 
     // console.log( user.id );
@@ -53,7 +56,7 @@ export default function BookCard ( { book }: { book: IBook } )
                 {/* Actions */}
                 <div className="flex flex-wrap gap-2">
                     {
-                        user.id === book.createdBy.id && (
+                        user?.id === book.createdBy.id && user?.id && (
                             <>
                                 <Link to={`/edit-book/${ book.id }`}>
                                     <Button variant="ghost" size="sm">
@@ -72,10 +75,10 @@ export default function BookCard ( { book }: { book: IBook } )
                     }
                     <>
                         <Button
-                            disabled={!book.available || user.id === book.createdBy.id}
+                            disabled={!book?.available || user?.id === book.createdBy.id || !user?.id}
                             variant="outline"
                             size="sm"
-                        // onClick={() => handleBorrow(book.id, book.title)}
+                            onClick={()=> dispatch(openModal(book))}
                         >
                             Borrow
                         </Button>

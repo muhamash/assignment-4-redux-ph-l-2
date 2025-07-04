@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { loginSchema, registerSchema } from "../../../lib/zod";
 import { useAppDispatch } from "../../hooks/useRedux";
 import { useLoginMutation, useRegisterMutation } from "../../redux/api/auth.api";
@@ -55,6 +55,7 @@ export default function AuthForm({ mode }: AuthFormInterface) {
     }
     catch (error: unknown)
     {
+      toast.error( "Operation failed!" );
       if (error instanceof Error) {
         console.error("Error:", error.message);
       } else {
@@ -64,8 +65,6 @@ export default function AuthForm({ mode }: AuthFormInterface) {
   };
 
   const apiError = ( loginError as ApiError )?.data?.message || ( regError as ApiError )?.data?.message;
-  
-  // console.log(apiError)
 
   return (
     <Form {...form}>
