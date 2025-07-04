@@ -1,6 +1,6 @@
 import type { RootState } from "@reduxjs/toolkit/query";
 import { Book, LogIn, LogOut, UserPlus } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { logout } from "../redux/features/auth/authSlice";
 import { Button } from "../ui/button";
@@ -8,9 +8,11 @@ import { Button } from "../ui/button";
 const Nav = () => {
     const user = useAppSelector( ( state: RootState ) => state.auth.user );
     const dispatch = useAppDispatch();
+    const location = useLocation();
+
+    console.log(location.pathname)
 
     // console.log(user)
-
     const navigate = useNavigate();
 
     const handleLogout = () =>
@@ -29,13 +31,13 @@ const Nav = () => {
                     </Link>
 
                     <div className="hidden md:flex items-center space-x-6">
-                        <Link to="/books" className="text-muted-foreground hover:text-foreground transition-colors">
+                        <Link to="/books" className={`text-muted-foreground hover:text-foreground transition-all duration-200 ${location.pathname === "/books" && "text-lg font-bold text-violet-600"}`}>
                             All Books
                         </Link>
-                        <Link to="/create-book" className="text-muted-foreground hover:text-foreground transition-colors">
+                        <Link to="/create-book" className={`text-muted-foreground hover:text-foreground transition-all duration-200 ${location.pathname === "/create-book" && "text-lg font-bold text-violet-600"}`}>
                             Add Book
                         </Link>
-                        <Link to="/borrow-summary" className="text-muted-foreground hover:text-foreground transition-colors">
+                        <Link to="/borrow-summary" className={`text-muted-foreground hover:text-foreground transition-all duration-200 ${location.pathname === "/borrow-summary" && "text-lg font-bold text-violet-600"}`}>
                             Borrow Summary
                         </Link>
                     </div>

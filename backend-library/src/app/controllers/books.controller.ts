@@ -70,7 +70,7 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
         const sortBy = zodBody.sortBy as string || 'createdAt';
         const sort = zodBody.sort === 'desc' ? -1 : 1;
         const limit: number = parseInt( zodBody.limit as any ) || 10;
-        const page: number = parseInt( zodBody.page as any ) | 1;
+        const page: number = parseInt( zodBody.page as any ) || 1;
 
         // console.log(filter?.toUpperCase())
         const query: any = {};
@@ -82,12 +82,12 @@ export const getBooks = async ( req: Request, res: Response ): Promise<void> =>
         }
 
         const totalBooks = await Books.countDocuments( query );
-        const skip = (page - 1) * limit;
         const totalPages = Math.ceil( totalBooks / limit );
+        const skip = (page - 1) * limit;
         
         const books = await Books.find( query )
             .sort( { [ sortBy ]: sort } )
-            .skip( skip )
+            .skip(skip)
             .limit( limit )
             .populate( "createdBy", "name email id" );
 

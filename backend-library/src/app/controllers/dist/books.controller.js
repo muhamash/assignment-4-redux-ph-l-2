@@ -100,7 +100,7 @@ exports.createBook = function (req, res, next) { return __awaiter(void 0, void 0
     });
 }); };
 exports.getBooks = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var zodBody, filter, sortBy, sort, limit, page, query, totalBooks, skip, totalPages, books, error_2, message;
+    var zodBody, filter, sortBy, sort, limit, page, query, totalBooks, totalPages, skip, books, error_2, message;
     var _a;
     var _b, _c;
     return __generator(this, function (_d) {
@@ -115,7 +115,7 @@ exports.getBooks = function (req, res) { return __awaiter(void 0, void 0, Promis
                 sortBy = zodBody.sortBy || 'createdAt';
                 sort = zodBody.sort === 'desc' ? -1 : 1;
                 limit = parseInt(zodBody.limit) || 10;
-                page = parseInt(zodBody.page) | 1;
+                page = parseInt(zodBody.page) || 1;
                 query = {};
                 if (filter) {
                     query.genre = filter;
@@ -126,8 +126,8 @@ exports.getBooks = function (req, res) { return __awaiter(void 0, void 0, Promis
                 return [4 /*yield*/, books_model_1.Books.countDocuments(query)];
             case 2:
                 totalBooks = _d.sent();
-                skip = (page - 1) * limit;
                 totalPages = Math.ceil(totalBooks / limit);
+                skip = (page - 1) * limit;
                 return [4 /*yield*/, books_model_1.Books.find(query)
                         .sort((_a = {}, _a[sortBy] = sort, _a))
                         .skip(skip)

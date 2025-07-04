@@ -59,3 +59,9 @@ export interface IBorrowSummaryItem {
   title: string;
   totalQuantity: number;
 }
+
+export export interface PaginationState {
+  page: number;
+  limit: number;
+  tab: "all" | "my";
+}

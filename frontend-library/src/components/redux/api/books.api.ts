@@ -22,21 +22,27 @@ export const booksApi = createApi( {
     tagTypes: [ "books", "borrows" ],
     endpoints: ( builder ) => ( {
         getBooks: builder.query<{ success: true; data: IBook[]; meta: IPaginationMeta }, BookQueryParams>({
-            query: (params = {}) => {
+            query: ( params = {} ) =>
+            {
                 const urlParams = new URLSearchParams();
+
                 if (params.filter) urlParams.append("filter", params.filter);
                 if (params.sortBy) urlParams.append("sortBy", params.sortBy);
                 if (params.sort) urlParams.append("sort", params.sort);
                 if (params.limit) urlParams.append("limit", params.limit);
                 if (params.page) urlParams.append("page", params.page);
-                if (params.userId) urlParams.append("userId", params.userId);
+                if ( params.userId ) urlParams.append( "userId", params.userId );
+                
+                console.log( {params }, `/books?${urlParams.toString()}`);
         
                 return `/books?${urlParams.toString()}`;
             },
+            providesTags: [ "books" ],
         }),        
 
         getBook: builder.query<{ success: true; data: IBook }, string>( {
             query: ( bookId ) => `/books/${ bookId }`,
+            providesTags: [ "books" ],
         } ),
 
         createBook: builder.mutation<{ success: true; data: IBook }, ICreateBookInput>( {

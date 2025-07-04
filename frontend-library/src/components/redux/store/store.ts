@@ -5,6 +5,7 @@ import { authApi } from '../api/auth.api';
 import { booksApi } from '../api/books.api';
 import authReducer from '../features/auth/authSlice';
 import modalReducer from "../features/books/modalSlice";
+import paginationReducer from "../features/books/paginationSlice";
 
 const persistConfig = {
     key: 'auth',
@@ -18,6 +19,7 @@ export const store = configureStore( {
     reducer: {
         auth: persistedAuthReducer,
         modal: modalReducer,
+        pagination: paginationReducer,
         [ authApi.reducerPath ]: authApi.reducer,
         [booksApi.reducerPath] : booksApi.reducer,
     },

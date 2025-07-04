@@ -57,7 +57,7 @@ const getBooks = async (req, res) => {
         const sortBy = zodBody.sortBy || 'createdAt';
         const sort = zodBody.sort === 'desc' ? -1 : 1;
         const limit = parseInt(zodBody.limit) || 10;
-        const page = parseInt(zodBody.page) | 1;
+        const page = parseInt(zodBody.page) || 1;
         // console.log(filter?.toUpperCase())
         const query = {};
         if (filter) {
@@ -67,8 +67,8 @@ const getBooks = async (req, res) => {
             query.createdBy = zodBody?.userId;
         }
         const totalBooks = await books_model_1.Books.countDocuments(query);
-        const skip = (page - 1) * limit;
         const totalPages = Math.ceil(totalBooks / limit);
+        const skip = (page - 1) * limit;
         const books = await books_model_1.Books.find(query)
             .sort({ [sortBy]: sort })
             .skip(skip)
