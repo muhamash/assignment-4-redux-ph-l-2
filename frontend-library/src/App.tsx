@@ -1,6 +1,5 @@
 // import React from 'react'
 import { Outlet } from 'react-router';
-import { Toaster } from 'sonner';
 import { useAutoRefresh } from './components/hooks/useAutoRefresh';
 import BorrowModal from './components/layouts/BorrowModal';
 import Footer from './components/layouts/Footer';

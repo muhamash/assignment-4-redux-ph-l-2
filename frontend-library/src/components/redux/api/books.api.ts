@@ -53,7 +53,7 @@ export const booksApi = createApi( {
                 url: `/books/${ id }`,
                 method: "DELETE",
             } ),
-            invalidatesTags: [ "books" ],
+            invalidatesTags: [ "books", "borrows" ],
         } ),
 
         borrowBook: builder.mutation<{ success: true; message: string }, { book: string; quantity: number, user: string, dueDate: Date }>( {

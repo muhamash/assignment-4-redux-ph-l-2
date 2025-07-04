@@ -1,5 +1,4 @@
 import { Loader2 } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { useGetBookQuery } from "../redux/api/books.api";
@@ -40,12 +39,7 @@ export default function BookDetail() {
 
     return (
         <>
-            <Helmet>
-                <title>{book.title} - Book Details</title>
-                <meta name="description" content={book.description || "Book detail page"} />
-            </Helmet>
             <div className="max-w-5xl mx-auto py-12 px-6">
-            
                 <h1 className="text-4xl font-bold mb-2">{book.title}</h1>
                 <p className="text-xl text-gray-600 mb-6">by {book.author}</p>
 
@@ -101,6 +95,7 @@ export default function BookDetail() {
                         Back
                     </Button>
                 </div>
-            </div></>
+            </div>
+        </>
     );
 }

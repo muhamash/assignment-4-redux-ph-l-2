@@ -1,7 +1,9 @@
 import type { RootState } from "@reduxjs/toolkit/query";
 import { Book, Edit, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
+import { useDeleteBookMutation } from "../redux/api/books.api";
 import { openModal } from "../redux/features/books/modalSlice";
 import type { IBook } from "../types/books.type";
 import { Badge } from "../ui/badge";
@@ -14,6 +16,61 @@ export default function BookCard ( { book }: { book: IBook } )
     const navigate = useNavigate();
 
     const user = useAppSelector( ( state: RootState ) => state?.auth?.user );
+    const [ deleteBook ] = useDeleteBookMutation();
+
+    // console.log(user.id)
+
+    const handleDelete = ( bookId: string ) =>
+    {
+        let localLoading = false;
+    
+        toast(
+            ( t ) =>
+            {
+                return (
+                    <div className="space-y-2">
+                        <p>Are you sure you want to delete this book?</p>
+                        <div className="flex gap-2">
+                            <Button
+                                size="sm"
+                                variant="destructive"
+                                disabled={localLoading}
+                                onClick={async () =>
+                                {
+                                    localLoading = true;
+                                    try
+                                    {
+                                        await deleteBook( bookId ).unwrap();
+                                        toast.dismiss( t );
+                                        toast.success( "Book deleted successfully" );
+                                    } catch ( error: unknown )
+                                    {
+                                        toast.dismiss( t );
+                                        // Show backend error message if available
+                                        const msg = error?.data?.message || "Failed to delete book";
+                                        toast.error( msg );
+                                    }
+                                }}
+                            >
+                                {localLoading ? "Deleting..." : "Confirm"}
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => toast.dismiss( t )}
+                                disabled={localLoading}
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+                    </div>
+                );
+            },
+            {
+                duration: Infinity,
+            }
+        );
+    };
 
     // console.log( user.id );
 
@@ -62,7 +119,7 @@ export default function BookCard ( { book }: { book: IBook } )
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                // onClick={() => handleDelete(book.id, book.title)}
+                                    onClick={() => handleDelete(book.id)}
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </Button>
