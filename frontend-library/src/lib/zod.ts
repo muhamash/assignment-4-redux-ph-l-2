@@ -54,7 +54,7 @@ export const zodBorrowSchema = z.object( {
             message: "Quantity must be at least 1",
         } ),
     dueDate: z
-        .string()
+        .date()
         .transform( ( val ) => new Date( val ) )
         .refine( ( date ) => date.getTime() > Date.now(), {
             message: "Due date must be in the future",

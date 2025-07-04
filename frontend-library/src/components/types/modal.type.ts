@@ -7,5 +7,5 @@ export interface ModalState {
 
 export interface BorrowFormValues {
     quantity: number;
-    dueDate: Date | undefined;
+    dueDate: string;
 };

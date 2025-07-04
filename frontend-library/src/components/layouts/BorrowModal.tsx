@@ -39,7 +39,7 @@ export default function BorrowModal ()
       
         try
         {
-            const zodValidation = zodBorrowSchema( {
+            const zodValidation = await zodBorrowSchema.parseAsync( {
                 book: book.id,
                 quantity: data.quantity,
                 dueDate: data.dueDate,
@@ -51,19 +51,29 @@ export default function BorrowModal ()
             //     dueDate: data.dueDate,
             //     user: user?.id
             // })
-            await borrowBook( zodValidation ).unwrap();
-      
-            toast.success( "Success!", {
-                description: `You have borrowed "${ book.title }" successfully.`,
-            } );              
-      
-            dispatch( closeBorrowModal() );
-            form.reset(); 
+            const res = await borrowBook( zodValidation ).unwrap();
+            // console.log(res)
+            if ( res.success )
+            {
+                toast.success( "Success!", {
+                    description: `You have borrowed "${ book.title }" successfully.`,
+                } );              
+          
+                dispatch( closeBorrowModal() );
+                form.reset(); 
+            }
+            else
+            {
+                toast.error( "Failed!", {
+                    description: `Failed to borrow the book.`,
+                } ); 
+            }
         }
         catch ( error: unknown )
         {
+            console.log(error.message)
             toast.error( "Failed!", {
-                description: `Failed to borrow the book. Please try again; ${error?.data?.message}`,
+                description: `Failed to borrow the book. Please try again; ${error?.message || error?.data?.message}`,
             } );              
         }
     };      
