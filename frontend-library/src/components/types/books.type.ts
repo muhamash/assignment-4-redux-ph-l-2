@@ -1,6 +1,6 @@
 export interface IBook {
-    id: string;
-    _id: string;
+    id?: string;
+    _id?: string;
     title: string;
     author: string;
     genre: string;
@@ -8,8 +8,8 @@ export interface IBook {
     description: string;
     available: boolean;
     copies: number;
-    createdAt: string;
-    createdBy: {
+    createdAt?: string;
+    createdBy?: {
       _id: string;
       name: string;
       email: string;

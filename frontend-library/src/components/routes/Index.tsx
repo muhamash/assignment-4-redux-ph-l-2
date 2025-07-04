@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router';
 import App from '../../App';
+import AddBooks from '../pages/AddBooks';
 import BookDetail from '../pages/BookDetail';
 import Books from '../pages/Books';
 import BorrowSummery from '../pages/BorrowSummery';
@@ -28,6 +29,10 @@ export const appRouter = createBrowserRouter( [
             {
                 path: "/books/:id",
                 Component: BookDetail,
+            },
+            {
+                path: "/create-book",
+                Component: AddBooks
             }
         ]
     },

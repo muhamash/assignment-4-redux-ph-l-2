@@ -2,6 +2,7 @@
 import { Outlet } from 'react-router';
 import { useAutoRefresh } from './components/hooks/useAutoRefresh';
 import BorrowModal from './components/layouts/BorrowModal';
+import EditModal from './components/layouts/EditModal';
 import Footer from './components/layouts/Footer';
 import Nav from './components/layouts/Nav';
 
@@ -17,7 +18,8 @@ export default function App ()
             <Nav />
             <Outlet />
             <Footer />
-            <BorrowModal/>
+            <BorrowModal />
+            <EditModal/>
         </div>
     );
 }

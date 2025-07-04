@@ -3,6 +3,7 @@ import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { cn } from "../../lib/utils";
+import { zodBorrowSchema } from "../../lib/zod";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { useBorrowBookMutation } from "../redux/api/books.api";
 import { closeModal } from "../redux/features/books/modalSlice";
@@ -38,18 +39,19 @@ export default function BorrowModal ()
       
         try
         {
+            const zodValidation = zodBorrowSchema( {
+                book: book.id,
+                quantity: data.quantity,
+                dueDate: data.dueDate,
+                user: user?.id
+            } );
             // console.log({
             //     book: book.id,
             //     quantity: data.quantity,
             //     dueDate: data.dueDate,
             //     user: user?.id
             // })
-            await borrowBook( {
-                book: book.id,
-                quantity: data.quantity,
-                dueDate: data.dueDate,
-                user: user?.id
-            } ).unwrap();
+            await borrowBook( zodValidation ).unwrap();
       
             toast.success( "Success!", {
                 description: `You have borrowed "${ book.title }" successfully.`,

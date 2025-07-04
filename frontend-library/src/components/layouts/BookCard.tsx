@@ -1,6 +1,6 @@
 import type { RootState } from "@reduxjs/toolkit/query";
-import { Book, Edit, Trash2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Book, EditIcon, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { useDeleteBookMutation } from "../redux/api/books.api";
@@ -110,15 +110,18 @@ export default function BookCard ( { book }: { book: IBook } )
                     {
                         user?.id === book.createdBy.id && user?.id && (
                             <>
-                                <Link to={`/edit-book/${ book.id }`}>
-                                    <Button variant="ghost" size="sm">
-                                        <Edit className="w-4 h-4" />
-                                    </Button>
-                                </Link>
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => handleDelete(book.id)}
+                                    onClick={() => dispatch( openModal( book ) )}
+                                >
+                                    <EditIcon className="w-4 h-4" />
+                                </Button>
+
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleDelete( book.id )}
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </Button>
@@ -130,7 +133,7 @@ export default function BookCard ( { book }: { book: IBook } )
                             disabled={!book?.available || user?.id === book.createdBy.id || !user?.id}
                             variant="outline"
                             size="sm"
-                            onClick={()=> dispatch(openModal(book))}
+                            onClick={() => dispatch( openModal( book ) )}
                         >
                             Borrow
                         </Button>
@@ -141,7 +144,7 @@ export default function BookCard ( { book }: { book: IBook } )
                             className="ml-auto"
                             variant="link"
                             size="sm"
-                            onClick={()=> navigate(`/books/${book?.id}`)}
+                            onClick={() => navigate( `/books/${ book?.id }` )}
                         >
                             View
                         </Button>

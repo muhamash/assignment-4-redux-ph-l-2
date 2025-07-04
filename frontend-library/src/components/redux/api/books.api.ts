@@ -10,7 +10,7 @@ export const booksApi = createApi( {
         credentials: "include",
         prepareHeaders: ( headers, { getState } ) =>
         {
-            const token = ( getState() as any ).auth.accessToken;
+            const token = ( getState() as unknown ).auth.accessToken;
             // console.log(token)
             if ( token )
             {

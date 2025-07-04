@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { LoginFormValues, RegisterFormValues } from "../../types/form.type";
+import type { LoginValues, RegisterValues } from "../../types/form.type";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -12,21 +12,21 @@ export const authApi = createApi( {
         credentials: "include",
     } ),
     endpoints: ( builder ) => ( {
-        login: builder.mutation<{ success: boolean; data: any }, LoginFormValues>( {
+        login: builder.mutation<{ success: boolean; data: unknown }, LoginValues>( {
             query: ( loginData ) => ( {
                 url: "/auth/login",
                 method: "POST",
                 body: loginData,
             } ),
         } ),
-        register: builder.mutation<{ success: boolean; data: any }, RegisterFormValues>( {
+        register: builder.mutation<{ success: boolean; data: unknown }, RegisterValues>( {
             query: ( registerData ) => ( {
                 url: "/auth/register",
                 method: "POST",
                 body: registerData,
             } ),
         } ),
-        refreshToken: builder.mutation<{ success: boolean; data: any }, void>( {
+        refreshToken: builder.mutation<{ success: boolean; data: unknown }, void>( {
             query: () => ( {
                 url: "/auth/refresh-token",
                 method: "POST",
