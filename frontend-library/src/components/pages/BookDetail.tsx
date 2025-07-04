@@ -2,7 +2,7 @@ import { Loader2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { useGetBookQuery } from "../redux/api/books.api";
-import { openModal } from "../redux/features/books/modalSlice";
+import { openBorrowModal } from "../redux/features/books/modalSlice";
 import { Button } from "../ui/button";
 
 export default function BookDetail() {
@@ -87,7 +87,7 @@ export default function BookDetail() {
                 <div className="flex space-x-4 mt-10">
                     <Button
                         disabled={!book?.available || user?.id === book.createdBy.id || !user?.id}
-                        onClick={() => dispatch( openModal( book ) )}
+                        onClick={() => dispatch( openBorrowModal( book ) )}
                     >
                         Borrow This Book
                     </Button>

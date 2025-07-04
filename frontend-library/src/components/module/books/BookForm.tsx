@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
-import { allowedGenres, zodBookSchema } from "../../../lib/zod";
+import { allowedGenres, zodBookSchema, zodUpdateBookSchema } from "../../../lib/zod";
+import type { IBook } from "../../types/books.type";
 import { Button } from "../../ui/button";
 import { Checkbox } from "../../ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../ui/form";
@@ -10,19 +11,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Textarea } from "../../ui/textarea";
 
 type BookFormValues = z.infer<typeof zodBookSchema>;
+interface BookFormProps
+{
+    mode?: "edit" | undefined;
+    book?: IBook | undefined
+}
 
-export default function BookForm() {
+export default function BookForm({mode, book}: BookFormProps) {
+
+    // const user = useAppSelector( ( state: RootState ) => state.auth.user );
+
+    const isEdit = mode === "edit";
+    const schema = isEdit ? zodUpdateBookSchema : zodBookSchema
 
     const form = useForm<BookFormValues>( {
-        resolver: zodResolver( zodBookSchema ),
+        resolver: zodResolver( schema ),
         defaultValues: {
-            title: "",
-            author: "",
-            genre: "",
-            isbn: "",
-            description: "",
-            copies: "",
-            available: "",
+            title: book?.title || "",
+            author: book?.author || "",
+            genre: book?.genre || "",
+            isbn: book?.isbn ||  "",
+            description: book?.description || "",
+            copies: book?.copies || "",
+            available: book?.available || "",
         },
     } );
 

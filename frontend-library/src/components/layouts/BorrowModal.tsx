@@ -6,7 +6,7 @@ import { cn } from "../../lib/utils";
 import { zodBorrowSchema } from "../../lib/zod";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { useBorrowBookMutation } from "../redux/api/books.api";
-import { closeModal } from "../redux/features/books/modalSlice";
+import { closeBorrowModal } from "../redux/features/books/modalSlice";
 import type { RootState } from "../redux/store/store";
 import type { ApiError } from "../types/form.type";
 import type { BorrowFormValues } from "../types/modal.type";
@@ -22,7 +22,7 @@ export default function BorrowModal ()
 {
     const dispatch = useAppDispatch();
     const user = useAppSelector( ( state: RootState ) => state.auth.user );
-    const { isOpen, book } = useAppSelector( ( state: RootState ) => state.modal );
+    const { isOpen, book } = useAppSelector( ( state: RootState ) => state.modal.borrowModal );
 
     const [ borrowBook, {data, isLoading, error } ] = useBorrowBookMutation();
 
@@ -57,7 +57,7 @@ export default function BorrowModal ()
                 description: `You have borrowed "${ book.title }" successfully.`,
             } );              
       
-            dispatch( closeModal() );
+            dispatch( closeBorrowModal() );
             form.reset(); 
         }
         catch ( error: unknown )
@@ -72,10 +72,10 @@ export default function BorrowModal ()
 
     const apiError = error?.data?.message as ApiError;
 
-    console.log( apiError, error, data );
+    console.log( apiError, error, data, "borrow modal" );
 
     return (
-        <Dialog open={isOpen} onOpenChange={( open ) => !open && dispatch( closeModal() )}>
+        <Dialog open={isOpen} onOpenChange={( open ) => !open && dispatch( closeBorrowModal() )}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogTitle>Borrow: {book.title}</DialogTitle>
                 <Form {...form}>
@@ -150,7 +150,7 @@ export default function BorrowModal ()
 
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button variant="outline" type="button" onClick={() => dispatch( closeModal() )}>
+                                <Button variant="outline" type="button" onClick={() => dispatch( closeBorrowModal() )}>
                                     Cancel
                                 </Button>
                             </DialogClose>

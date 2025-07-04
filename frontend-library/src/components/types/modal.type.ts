@@ -1,7 +1,9 @@
 export interface ModalState {
-    isOpen: boolean;
-    book: IBook | null;
-};
+    [ key: string ]: {
+        isOpen: boolean;
+        book: IBook | null;
+    };
+};  
 
 export interface BorrowFormValues {
     quantity: number;

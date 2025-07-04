@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router';
 import App from '../../App';
+import AuthGuard from '../guard/AuthGuard';
 import AddBooks from '../pages/AddBooks';
 import BookDetail from '../pages/BookDetail';
 import Books from '../pages/Books';
@@ -23,7 +24,9 @@ export const appRouter = createBrowserRouter( [
                 index: true
             },
             {
-                Component: BorrowSummery,
+                element: <AuthGuard>
+                    <BorrowSummery />
+                </AuthGuard>,
                 path: '/borrow-summary'
             },
             {
@@ -32,7 +35,9 @@ export const appRouter = createBrowserRouter( [
             },
             {
                 path: "/create-book",
-                Component: AddBooks
+                element: <AuthGuard>
+                    <AddBooks />
+                </AuthGuard>
             }
         ]
     },

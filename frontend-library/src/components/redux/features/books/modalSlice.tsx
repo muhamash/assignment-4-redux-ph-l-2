@@ -1,27 +1,41 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import type { IBook } from "../../../types/books.type";
-import type { ModalState } from "../../../types/modal.type";
+import type { BorrowFormValues, ModalState } from "../../../types/modal.type";
 
 const initialState: ModalState = {
-  isOpen: false,
-  book: null,
+  editModal: {
+    isOpen: false,
+    book: null,
+  },
+  borrowModal: {
+    isOpen: false,
+    book: null,
+  }
 };
 
 export const modalSlice = createSlice({
   name: "modal",
   initialState,
   reducers: {
-    openModal: (state, action: PayloadAction<IBook>) => {
-      state.isOpen = true;
-      state.book = action.payload;
+    openBorrowModal: (state, action: PayloadAction<BorrowFormValues>) => {
+      state.borrowModal.isOpen = true;
+      state.borrowModal.book = action.payload;
     },
-    closeModal: (state) => {
-      state.isOpen = false;
-      state.book = null;
+    closeBorrowModal: (state) => {
+      state.borrowModal.isOpen = false;
+      state.borrowModal.book = null;
+    },
+    openEditModal: (state, action: PayloadAction<IBook>) => {
+      state.editModal.isOpen = true;
+      state.editModal.book = action.payload;
+    },
+    closeEditModal: (state) => {
+      state.editModal.isOpen = false;
+      state.editModal.book = null;
     },
   },
 });
 
-export const { openModal, closeModal } = modalSlice.actions;
+export const { openBorrowModal, openEditModal, closeBorrowModal, closeEditModal } = modalSlice.actions;
 export default modalSlice.reducer;

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { useDeleteBookMutation } from "../redux/api/books.api";
-import { openModal } from "../redux/features/books/modalSlice";
+import { openBorrowModal, openEditModal } from "../redux/features/books/modalSlice";
 import type { IBook } from "../types/books.type";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -113,7 +113,7 @@ export default function BookCard ( { book }: { book: IBook } )
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => dispatch( openModal( book ) )}
+                                    onClick={() => dispatch( openEditModal( book ) )}
                                 >
                                     <EditIcon className="w-4 h-4" />
                                 </Button>
@@ -133,7 +133,7 @@ export default function BookCard ( { book }: { book: IBook } )
                             disabled={!book?.available || user?.id === book.createdBy.id || !user?.id}
                             variant="outline"
                             size="sm"
-                            onClick={() => dispatch( openModal( book ) )}
+                            onClick={() => dispatch( openBorrowModal( book ) )}
                         >
                             Borrow
                         </Button>
