@@ -80,8 +80,8 @@ const login = async (req, res, next) => {
         });
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: "strict",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         }).status(200).json({
             success: true,
@@ -146,8 +146,8 @@ const refreshToken = async (req, res, next) => {
         await session_model_1.Session.findOneAndUpdate({ refreshToken }, { refreshToken: newRefreshToken, expiresAt });
         res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: "strict",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         }).status(200).json({
             success: true,

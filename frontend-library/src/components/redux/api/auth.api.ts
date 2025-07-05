@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { LoginResponse } from "../../types/auth.type";
+import type { LoginResponse, RefreshTokenResponse } from "../../types/auth.type";
 import type { LoginValues, RegisterValues } from "../../types/form.type";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -27,7 +27,7 @@ export const authApi = createApi( {
                 body: registerData,
             } ),
         } ),
-        refreshToken: builder.mutation<{ success: boolean; data: unknown }, void>( {
+        refreshToken: builder.mutation<{ success: boolean; data: RefreshTokenResponse }, void>( {
             query: () => ( {
                 url: "/auth/refresh-token",
                 method: "POST",
