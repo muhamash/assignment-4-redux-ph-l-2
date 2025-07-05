@@ -79,7 +79,7 @@ export const zodUpdateBookSchema = zodBookSchema.partial().extend( {
     genre: z
         .string()
         .transform( ( val ) => val.toUpperCase() )
-        .refine( ( val ) => allowedGenres.includes( val as unknown ), {
+        .refine( ( val ) => allowedGenres.includes( val as string ), {
             message:
                 "Genre must be one of the following: FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY, FANTASY",
         } ).optional(),

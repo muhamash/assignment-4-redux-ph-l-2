@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import BookForm from "../module/books/BookForm";
 import { closeEditModal } from "../redux/features/books/modalSlice";
+import type { RootState } from "../redux/store/store";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 
 export default function EditModal ()

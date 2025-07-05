@@ -5,7 +5,7 @@ import type { AuthState, User } from "../../../types/auth.type";
 const initialState: AuthState = {
     user: null,
     accessToken: null,
-    accessTokenExpiresAt: null
+    accessTokenExpiresAt: undefined
 };
 
 const authSlice = createSlice( {

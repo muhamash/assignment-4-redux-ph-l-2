@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { useGetBookQuery } from "../redux/api/books.api";
 import { openBorrowModal } from "../redux/features/books/modalSlice";
 import { Button } from "../ui/button";
+import type { RootState } from "../redux/store/store";
 
 export default function BookDetail() {
     const { id } = useParams();
@@ -11,7 +12,7 @@ export default function BookDetail() {
     const dispatch = useAppDispatch();
     const user = useAppSelector( ( state: RootState ) => state?.auth?.user );
 
-    const { data, isLoading, error } = useGetBookQuery( id );
+    const { data, isLoading, error } = useGetBookQuery( id as string );
 
   if (isLoading) {
       return (

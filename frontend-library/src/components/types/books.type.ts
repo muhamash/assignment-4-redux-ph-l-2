@@ -60,7 +60,7 @@ export interface IBorrowSummaryItem {
   totalQuantity: number;
 }
 
-export export interface PaginationState {
+export interface PaginationState {
   page: number;
   limit: number;
   tab: "all" | "my";

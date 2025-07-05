@@ -1,9 +1,9 @@
-import type { RootState } from "@reduxjs/toolkit/query";
 import { Book, LogIn, LogOut, UserPlus } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { logout } from "../redux/features/auth/authSlice";
 import { Button } from "../ui/button";
+import type { RootState } from "../redux/store/store";
 
 const Nav = () => {
     const user = useAppSelector( ( state: RootState ) => state.auth.user );

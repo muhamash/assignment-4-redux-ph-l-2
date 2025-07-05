@@ -9,5 +9,5 @@ export interface User {
 export interface AuthState {
   user: User | null;
   accessToken: string | null;
-  accessTokenExpiresAt: string | Date | null;
+  accessTokenExpiresAt: string | Date | undefined | null;
 }

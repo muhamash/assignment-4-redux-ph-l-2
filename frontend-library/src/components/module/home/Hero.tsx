@@ -5,7 +5,7 @@ import { useGetBooksQuery } from '../../redux/api/books.api';
 import type { IBook } from '../../types/books.type';
 
 export default function Hero() {
-    const { data, isLoading, isError } = useGetBooksQuery();
+    const { data, isLoading, isError } = useGetBooksQuery(undefined);
 
     const books = data?.data?.slice( 0, 6 ) || [];
     // console.log(books)

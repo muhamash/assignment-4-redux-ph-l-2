@@ -33,7 +33,7 @@ export default function Books() {
   
   // console.log(user)
 
-  const books = data?.data;
+  const books = data?.data || undefined;
   console.log(data, isError)
   const meta = data?.meta;
   const totalPages = meta?.totalPages || 1;
@@ -46,7 +46,7 @@ export default function Books() {
     if (page > 1) dispatch(setPage(page - 1));
   };
 
-  const handleTabChange = (value: "all" | "my") => {
+  const handleTabChange = (value: "all" | "my"): void => {
     dispatch(setTab(value));
   };
 
@@ -72,8 +72,8 @@ export default function Books() {
 
       {!isLoading && !isError && books?.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
-          {books.map((book: IBook) => (
-            <BookCard key={book.id} book={book} />
+          {books?.map((book: IBook) => (
+            <BookCard key={book?.id} book={book} />
           ))}
         </div>
       )}
