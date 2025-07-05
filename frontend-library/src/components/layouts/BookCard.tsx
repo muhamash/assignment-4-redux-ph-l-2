@@ -24,7 +24,7 @@ export default function BookCard ( { book }: { book: IBook } )
     const handleDelete = ( bookId: string ) =>
     {
         toast.custom( ( t ) => (
-            <div className="space-y-2 w-full">
+            <div className="space-y-2 w-full bg-slate-100 p-4">
                 <p className="text-rose-600 text-lg">Are you sure you want to delete this book?</p>
                 <div className="flex gap-2">
                     <Button
