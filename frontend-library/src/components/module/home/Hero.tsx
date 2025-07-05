@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import BookCard from '../../layouts/BookCard';
 import { useGetBooksQuery } from '../../redux/api/books.api';
 import type { IBook } from '../../types/books.type';
+import { isFetchBaseQueryError } from '../../guard/TypeGuards';
 
 export default function Hero() {
     const { data, isLoading, error: isError } = useGetBooksQuery({});
@@ -10,18 +11,10 @@ export default function Hero() {
     const books = data?.data?.slice( 0, 6 ) || [];
     // console.log( books );
 
-    if ( isError )
-    {
-        let errorMessage = "Unexpected error";
-        if (isError && "status" in isError && isError.data) {
-            errorMessage = JSON.stringify(isError.data);
-        }
-
-        return <p className="text-red-300">Failed to load books. Please try again; {errorMessage}.</p>;
-        
-
-    };
-
+    const apiError = isError && isFetchBaseQueryError( isError ) && isError.data && typeof isError.data === "object"
+        ? ( isError.data as { message?: string } ).message
+        : null;
+    
     return (
         <section className="bg-sky-800 py-20 flex flex-col items-center justify-center gap-10">
             <div className="container mx-auto px-4 text-center">
@@ -57,6 +50,12 @@ export default function Hero() {
                     <div>
                         Empty database!!!
                     </div>
+                )
+            }
+
+            {
+                apiError && (
+                    <p className="text-red-300">Failed to load books. Please try again; {apiError}.</p>
                 )
             }
 
