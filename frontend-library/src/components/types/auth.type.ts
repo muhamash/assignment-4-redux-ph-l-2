@@ -13,11 +13,16 @@ export interface AuthState {
 }
 
 export interface LoginResponse {
-  id: string;
-  email: string;
-  name: string;
-  accessToken: string;
-  accessTokenExpiresAt: string | Date;
+  success: boolean;
+  message: string;
+  data: {
+    id: string;
+    email: string;
+    name: string;
+    accessToken: string;
+    accessTokenExpiresAt: string;
+    expire?: string;
+  }
 }
 
 export interface RefreshTokenResponse {

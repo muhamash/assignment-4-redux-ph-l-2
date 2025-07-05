@@ -313,17 +313,7 @@ npm run analyze      # Analyze bundle size
 - **Source Maps:** Proper error stack traces
 
 ---
-
-## 🎨 Component Examples
-
-### **📚 Book Card Component**
 ```tsx
-interface BookCardProps {
-  book: Book;
-  onEdit: (book: Book) => void;
-  onDelete: (id: string) => void;
-  onBorrow: (book: Book) => void;
-}
 
 export const BookCard: React.FC<BookCardProps> = ({
   book,

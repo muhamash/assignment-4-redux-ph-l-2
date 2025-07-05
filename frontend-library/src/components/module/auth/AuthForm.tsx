@@ -53,16 +53,22 @@ export default function AuthForm({ mode }: AuthFormInterface) {
         const res = await login( values as LoginValues ).unwrap();
 
         const user: User = {
-          id: res.id,
-          email: res.email,
-          name: res.name,
+          id: res.data.id,
+          email: res.data.email,
+          name: res.data.name,
         };
 
         dispatch( getCredentials( {
           user,
-          accessToken: res.accessToken,
-          accessTokenExpiresAt: res.accessTokenExpiresAt,
+          accessToken: res.data.accessToken,
+          accessTokenExpiresAt: res.data.accessTokenExpiresAt,
         } ) );
+
+        console.log( {
+          user,
+          accessToken: res.data.accessToken,
+          accessTokenExpiresAt: res.data.accessTokenExpiresAt,
+        }, res );
 
         navigate( "/" );
       }

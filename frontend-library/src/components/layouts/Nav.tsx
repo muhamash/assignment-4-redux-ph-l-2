@@ -2,15 +2,15 @@ import { Book, LogIn, LogOut, UserPlus } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { logout } from "../redux/features/auth/authSlice";
-import { Button } from "../ui/button";
 import type { RootState } from "../redux/store/store";
+import { Button } from "../ui/button";
 
 const Nav = () => {
     const user = useAppSelector( ( state: RootState ) => state.auth.user );
     const dispatch = useAppDispatch();
     const location = useLocation();
 
-    console.log(location.pathname)
+    console.log(user)
 
     // console.log(user)
     const navigate = useNavigate();
