@@ -72,7 +72,7 @@ const login = async (req, res, next) => {
         const accessToken = (0, jwt_util_1.generateAccessToken)(user.id);
         const refreshToken = (0, jwt_util_1.generateRefreshToken)(user.id);
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        const accessTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000);
+        const accessTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
         await session_model_1.Session.deleteMany({ user: user.id });
         await session_model_1.Session.create({
             user: user.id,
@@ -193,7 +193,7 @@ const refreshToken = async (req, res, next) => {
         const newAccessToken = (0, jwt_util_1.generateAccessToken)(payload.id);
         const newRefreshToken = (0, jwt_util_1.generateRefreshToken)(payload.id);
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        const accessTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000);
+        const accessTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
         // Update the session with new refresh token
         await session_model_1.Session.findOneAndUpdate({ refreshToken }, { refreshToken: newRefreshToken, expiresAt });
         res.cookie("refreshToken", newRefreshToken, {
