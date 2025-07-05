@@ -68,7 +68,7 @@ export const useAutoRefresh = () =>
         console.log( "Time until expire (ms):", timeUntilExpire );
         console.log( "Time until expire (minutes):", Math.round( timeUntilExpire / 60000 ) );
 
-        const refreshTime = timeUntilExpire - 30 * 1000;
+        const refreshTime = timeUntilExpire - 60 * 1000;
         
         console.log( "Refresh time (ms):", refreshTime );
         console.log( "Refresh time (minutes):", Math.round( refreshTime / 60000 ) );

@@ -84,7 +84,7 @@ export const login = async ( req: Request, res: Response, next: NextFunction ): 
         const accessToken = generateAccessToken( user.id );
         const refreshToken = generateRefreshToken( user.id );
         const expiresAt = new Date( Date.now() + 7 * 24 * 60 * 60 * 1000 );
-        const accessTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000);
+        const accessTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
         await Session.deleteMany({ user: user.id });
 
@@ -227,7 +227,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
         const newAccessToken = generateAccessToken( payload.id );
         const newRefreshToken = generateRefreshToken( payload.id );
         const expiresAt = new Date( Date.now() + 7 * 24 * 60 * 60 * 1000 );
-        const accessTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000);
+        const accessTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
   
         // Update the session with new refresh token
         await Session.findOneAndUpdate(

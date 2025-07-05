@@ -135,7 +135,7 @@ exports.login = function (req, res, next) { return __awaiter(void 0, void 0, Pro
                 accessToken = jwt_util_1.generateAccessToken(user.id);
                 refreshToken_1 = jwt_util_1.generateRefreshToken(user.id);
                 expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-                accessTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000);
+                accessTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
                 return [4 /*yield*/, session_model_1.Session.deleteMany({ user: user.id })];
             case 4:
                 _c.sent();
@@ -277,7 +277,7 @@ exports.refreshToken = function (req, res, next) { return __awaiter(void 0, void
                 newAccessToken = jwt_util_1.generateAccessToken(payload.id);
                 newRefreshToken = jwt_util_1.generateRefreshToken(payload.id);
                 expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-                accessTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000);
+                accessTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
                 // Update the session with new refresh token
                 return [4 /*yield*/, session_model_1.Session.findOneAndUpdate({ refreshToken: refreshToken_2 }, { refreshToken: newRefreshToken, expiresAt: expiresAt })];
             case 12:
