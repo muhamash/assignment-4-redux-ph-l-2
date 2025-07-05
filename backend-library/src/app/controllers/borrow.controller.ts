@@ -117,8 +117,11 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
 {
     try
     {
-        const summary = await Borrow.aggregate( [
-            // First group by book + user to get per-user quantity
+        const page = parseInt( req.query.page as string ) || 1;
+        const limit = parseInt( req.query.limit as string ) || 10;
+        const skip = ( page - 1 ) * limit;
+
+        const basePipeline: any[] = [
             {
                 $group: {
                     _id: {
@@ -128,7 +131,6 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
                     userQuantity: { $sum: '$quantity' }
                 }
             },
-            // Group again by book to gather all users
             {
                 $group: {
                     _id: '$_id.book',
@@ -141,7 +143,6 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
                     }
                 }
             },
-            // Lookup book details
             {
                 $lookup: {
                     from: 'books',
@@ -151,8 +152,6 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
                 }
             },
             { $unwind: '$bookDetails' },
-
-            // Lookup user details
             {
                 $lookup: {
                     from: 'users',
@@ -161,7 +160,6 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
                     as: 'userDetails'
                 }
             },
-            // Map user info
             {
                 $project: {
                     _id: 0,
@@ -177,7 +175,6 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
                             in: {
                                 id: '$$u.userId',
                                 quantity: '$$u.quantity',
-                                // find user detail matching userId
                                 name: {
                                     $arrayElemAt: [
                                         {
@@ -219,46 +216,66 @@ export const BorrowBooksSummary = async ( req: Request, res: Response ): Promise
                     }
                 }
             }
+        ];
+  
+        const totalResult = await Borrow.aggregate( [
+            ...basePipeline,
+            { $count: 'total' }
         ] );
-
-        if( summary.length === 0 )
+  
+        const totalItems = totalResult[ 0 ]?.total || 0;
+        const totalPages = Math.ceil( totalItems / limit );
+  
+        // Apply pagination
+        const summary = await Borrow.aggregate( [
+            ...basePipeline,
+            { $skip: skip },
+            { $limit: limit }
+        ] );
+  
+        if ( summary.length === 0 )
         {
             res.status( 404 ).json( {
                 success: false,
-                message: "No borrow records found, summary is empty",
+                message: 'No borrow records found, summary is empty',
                 data: null
             } );
-
             return;
         }
-        
+  
         res.status( 200 ).json( {
             success: true,
-            message: "Borrow summary retrieved successfully",
+            message: 'Borrow summary retrieved successfully',
             data: summary,
+            pagination: {
+                totalItems,
+                totalPages,
+                currentPage: page,
+                pageSize: limit
+            }
         } );
     }
     catch ( error )
     {
-        // console.error( "Error in BorrowBooksSummary controller:", error );
         if ( error instanceof Error )
         {
             res.status( 500 ).json( {
-                message: error?.message || "Internal Server Error",
+                message: error.message || 'Internal Server Error',
                 success: false,
-                error: error instanceof Error ? error as any : "Unknown error", name: error.name,
+                error: error,
+                name: error.name,
                 stack: error.stack
             } );
         }
         else
         {
             res.status( 500 ).json( {
-                message: "An unknown error occurred",
+                message: 'An unknown error occurred',
                 success: false,
-                error: error,
-                name: "UnknownError",
-                stack: "No stack trace available"
+                error,
+                name: 'UnknownError',
+                stack: 'No stack trace available'
             } );
         }
     }
-}
+};

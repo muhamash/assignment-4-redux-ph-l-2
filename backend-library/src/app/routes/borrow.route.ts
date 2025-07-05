@@ -7,4 +7,4 @@ export const borrowRouter = express.Router();
 
 borrowRouter.post( "/", verifyAccessToken, preventOwnBorrow, borrowABook );
 
-borrowRouter.get( "/", verifyAccessToken, BorrowBooksSummary );
+borrowRouter.get( "/summary", verifyAccessToken, BorrowBooksSummary );

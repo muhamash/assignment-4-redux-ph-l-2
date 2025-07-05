@@ -16,7 +16,7 @@ export const useAutoRefresh = () =>
         {
             const refreshResult = await dispatch( authApi.endpoints.refreshToken.initiate() ).unwrap();
 
-            console.log(refreshResult)
+            console.log( refreshResult?.data )
 
             if ( refreshResult?.data )
             {
@@ -41,9 +41,9 @@ export const useAutoRefresh = () =>
 
     useEffect( () =>
     {
-        if ( !accessTokenExpiresAt || !user) return;
+        if ( !accessTokenExpiresAt || !user ) return;
 
-        console.log("Refreshing the token!!")
+        console.log( "Refreshing the token!!" )
 
         const expiresDate = new Date( accessTokenExpiresAt ).getTime();
         const now = Date.now();
@@ -51,7 +51,7 @@ export const useAutoRefresh = () =>
 
         // Refresh 1 minute before expiry
         const refreshTime = timeUntilExpire - 60 * 1000;
-        console.log(refreshTime, expiresDate)
+        console.log( refreshTime, expiresDate )
 
         if ( refreshTime <= 0 )
         {
@@ -68,5 +68,5 @@ export const useAutoRefresh = () =>
         console.log( "token refreshed" )
 
         return () => clearTimeout( timer );
-    }, [ accessTokenExpiresAt, handleRefresh ] );
+    }, [ accessTokenExpiresAt, user, handleRefresh ] );
 };

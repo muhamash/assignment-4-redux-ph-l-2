@@ -21,24 +21,24 @@ export const booksApi = createApi( {
     } ),
     tagTypes: [ "books", "borrows" ],
     endpoints: ( builder ) => ( {
-        getBooks: builder.query<{ success: true; data: IBook[]; meta: IPaginationMeta }, BookQueryParams>({
+        getBooks: builder.query<{ success: true; data: IBook[]; meta: IPaginationMeta }, BookQueryParams>( {
             query: ( params = {} ) =>
             {
                 const urlParams = new URLSearchParams();
 
-                if (params.filter) urlParams.append("filter", params.filter);
-                if (params.sortBy) urlParams.append("sortBy", params.sortBy);
-                if (params.sort) urlParams.append("sort", params.sort);
-                if (params.limit) urlParams.append("limit", params.limit);
-                if (params.page) urlParams.append("page", params.page);
+                if ( params.filter ) urlParams.append( "filter", params.filter );
+                if ( params.sortBy ) urlParams.append( "sortBy", params.sortBy );
+                if ( params.sort ) urlParams.append( "sort", params.sort );
+                if ( params.limit ) urlParams.append( "limit", params.limit );
+                if ( params.page ) urlParams.append( "page", params.page );
                 if ( params.userId ) urlParams.append( "userId", params.userId );
                 
-                console.log( {params }, `/books?${urlParams.toString()}`);
+                console.log( { params }, `/books?${ urlParams.toString() }` );
         
-                return `/books?${urlParams.toString()}`;
+                return `/books?${ urlParams.toString() }`;
             },
             providesTags: [ "books" ],
-        }),        
+        } ),
 
         getBook: builder.query<{ success: true; data: IBook }, string>( {
             query: ( bookId ) => `/books/${ bookId }`,
@@ -80,8 +80,15 @@ export const booksApi = createApi( {
             invalidatesTags: [ "books", "borrows" ],
         } ),
       
-        getBorrowSummary: builder.query<{ success: true; data: IBorrowSummaryItem[] }, void>( {
-            query: () => "/borrow/summary",
+        getBorrowSummary: builder.query<{ success: true; data: IBorrowSummaryItem[]; pagination: { totalItems: number; totalPages: number; currentPage: number; pageSize: number } }, { page?: number; limit?: number }>( {
+            query: ( { page = 1, limit = 10 } = {} ) =>
+            {
+                const params = new URLSearchParams();
+                params.append( "page", String( page ) );
+                params.append( "limit", String( limit ) );
+        
+                return `/borrow/summary?${ params.toString() }`;
+            },
             providesTags: [ "borrows" ],
         } ),
     } ),

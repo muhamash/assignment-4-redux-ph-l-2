@@ -46,6 +46,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 exports.__esModule = true;
 exports.BorrowBooksSummary = exports.borrowABook = void 0;
 var books_model_1 = require("../models/books.model");
@@ -136,152 +143,166 @@ exports.borrowABook = function (req, res) { return __awaiter(void 0, void 0, Pro
     });
 }); };
 exports.BorrowBooksSummary = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var summary, error_2;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var page, limit, skip, basePipeline, totalResult, totalItems, totalPages, summary, error_2;
+    var _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, borrow_model_1.Borrow.aggregate([
-                        // First group by book + user to get per-user quantity
-                        {
-                            $group: {
-                                _id: {
-                                    book: '$book',
-                                    user: '$user'
-                                },
-                                userQuantity: { $sum: '$quantity' }
-                            }
-                        },
-                        // Group again by book to gather all users
-                        {
-                            $group: {
-                                _id: '$_id.book',
-                                totalQuantity: { $sum: '$userQuantity' },
-                                users: {
-                                    $push: {
-                                        userId: '$_id.user',
-                                        quantity: '$userQuantity'
-                                    }
+                _b.trys.push([0, 3, , 4]);
+                page = parseInt(req.query.page) || 1;
+                limit = parseInt(req.query.limit) || 10;
+                skip = (page - 1) * limit;
+                basePipeline = [
+                    {
+                        $group: {
+                            _id: {
+                                book: '$book',
+                                user: '$user'
+                            },
+                            userQuantity: { $sum: '$quantity' }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: '$_id.book',
+                            totalQuantity: { $sum: '$userQuantity' },
+                            users: {
+                                $push: {
+                                    userId: '$_id.user',
+                                    quantity: '$userQuantity'
                                 }
                             }
-                        },
-                        // Lookup book details
-                        {
-                            $lookup: {
-                                from: 'books',
-                                localField: '_id',
-                                foreignField: '_id',
-                                as: 'bookDetails'
-                            }
-                        },
-                        { $unwind: '$bookDetails' },
-                        // Lookup user details
-                        {
-                            $lookup: {
-                                from: 'users',
-                                localField: 'users.userId',
-                                foreignField: '_id',
-                                as: 'userDetails'
-                            }
-                        },
-                        // Map user info
-                        {
-                            $project: {
-                                _id: 0,
-                                book: {
-                                    title: '$bookDetails.title',
-                                    isbn: '$bookDetails.isbn'
-                                },
-                                totalQuantity: 1,
-                                users: {
-                                    $map: {
-                                        input: '$users',
-                                        as: 'u',
-                                        "in": {
-                                            id: '$$u.userId',
-                                            quantity: '$$u.quantity',
-                                            // find user detail matching userId
-                                            name: {
-                                                $arrayElemAt: [
-                                                    {
-                                                        $map: {
-                                                            input: {
-                                                                $filter: {
-                                                                    input: '$userDetails',
-                                                                    as: 'ud',
-                                                                    cond: { $eq: ['$$ud._id', '$$u.userId'] }
-                                                                }
-                                                            },
-                                                            as: 'match',
-                                                            "in": '$$match.name'
-                                                        }
-                                                    },
-                                                    0
-                                                ]
-                                            },
-                                            email: {
-                                                $arrayElemAt: [
-                                                    {
-                                                        $map: {
-                                                            input: {
-                                                                $filter: {
-                                                                    input: '$userDetails',
-                                                                    as: 'ud',
-                                                                    cond: { $eq: ['$$ud._id', '$$u.userId'] }
-                                                                }
-                                                            },
-                                                            as: 'match',
-                                                            "in": '$$match.email'
-                                                        }
-                                                    },
-                                                    0
-                                                ]
-                                            }
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'books',
+                            localField: '_id',
+                            foreignField: '_id',
+                            as: 'bookDetails'
+                        }
+                    },
+                    { $unwind: '$bookDetails' },
+                    {
+                        $lookup: {
+                            from: 'users',
+                            localField: 'users.userId',
+                            foreignField: '_id',
+                            as: 'userDetails'
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            book: {
+                                title: '$bookDetails.title',
+                                isbn: '$bookDetails.isbn'
+                            },
+                            totalQuantity: 1,
+                            users: {
+                                $map: {
+                                    input: '$users',
+                                    as: 'u',
+                                    "in": {
+                                        id: '$$u.userId',
+                                        quantity: '$$u.quantity',
+                                        name: {
+                                            $arrayElemAt: [
+                                                {
+                                                    $map: {
+                                                        input: {
+                                                            $filter: {
+                                                                input: '$userDetails',
+                                                                as: 'ud',
+                                                                cond: { $eq: ['$$ud._id', '$$u.userId'] }
+                                                            }
+                                                        },
+                                                        as: 'match',
+                                                        "in": '$$match.name'
+                                                    }
+                                                },
+                                                0
+                                            ]
+                                        },
+                                        email: {
+                                            $arrayElemAt: [
+                                                {
+                                                    $map: {
+                                                        input: {
+                                                            $filter: {
+                                                                input: '$userDetails',
+                                                                as: 'ud',
+                                                                cond: { $eq: ['$$ud._id', '$$u.userId'] }
+                                                            }
+                                                        },
+                                                        as: 'match',
+                                                        "in": '$$match.email'
+                                                    }
+                                                },
+                                                0
+                                            ]
                                         }
                                     }
                                 }
                             }
                         }
-                    ])];
+                    }
+                ];
+                return [4 /*yield*/, borrow_model_1.Borrow.aggregate(__spreadArrays(basePipeline, [
+                        { $count: 'total' }
+                    ]))];
             case 1:
-                summary = _a.sent();
+                totalResult = _b.sent();
+                totalItems = ((_a = totalResult[0]) === null || _a === void 0 ? void 0 : _a.total) || 0;
+                totalPages = Math.ceil(totalItems / limit);
+                return [4 /*yield*/, borrow_model_1.Borrow.aggregate(__spreadArrays(basePipeline, [
+                        { $skip: skip },
+                        { $limit: limit }
+                    ]))];
+            case 2:
+                summary = _b.sent();
                 if (summary.length === 0) {
                     res.status(404).json({
                         success: false,
-                        message: "No borrow records found, summary is empty",
+                        message: 'No borrow records found, summary is empty',
                         data: null
                     });
                     return [2 /*return*/];
                 }
                 res.status(200).json({
                     success: true,
-                    message: "Borrow summary retrieved successfully",
-                    data: summary
+                    message: 'Borrow summary retrieved successfully',
+                    data: summary,
+                    pagination: {
+                        totalItems: totalItems,
+                        totalPages: totalPages,
+                        currentPage: page,
+                        pageSize: limit
+                    }
                 });
-                return [3 /*break*/, 3];
-            case 2:
-                error_2 = _a.sent();
-                // console.error( "Error in BorrowBooksSummary controller:", error );
+                return [3 /*break*/, 4];
+            case 3:
+                error_2 = _b.sent();
                 if (error_2 instanceof Error) {
                     res.status(500).json({
-                        message: (error_2 === null || error_2 === void 0 ? void 0 : error_2.message) || "Internal Server Error",
+                        message: error_2.message || 'Internal Server Error',
                         success: false,
-                        error: error_2 instanceof Error ? error_2 : "Unknown error",
+                        error: error_2,
                         name: error_2.name,
                         stack: error_2.stack
                     });
                 }
                 else {
                     res.status(500).json({
-                        message: "An unknown error occurred",
+                        message: 'An unknown error occurred',
                         success: false,
                         error: error_2,
-                        name: "UnknownError",
-                        stack: "No stack trace available"
+                        name: 'UnknownError',
+                        stack: 'No stack trace available'
                     });
                 }
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
