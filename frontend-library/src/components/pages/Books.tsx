@@ -36,7 +36,7 @@ export default function Books() {
   // console.log(user)
 
   const books = data?.data || undefined;
-  // console.log(data, isError)
+  console.log(data, isError)
   const meta = data?.meta;
   const totalPages = meta?.totalPages || 1;
 
@@ -97,7 +97,7 @@ export default function Books() {
       )}
 
 
-      {totalPages > 1 && (
+      {totalPages > 1 && books?.length !== 0 && (
         <Pagination className="mt-8">
           <PaginationContent>
             <PaginationItem>
