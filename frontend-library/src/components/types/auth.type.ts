@@ -15,14 +15,17 @@ export interface AuthState {
 export interface LoginResponse {
   success: boolean;
   message: string;
-  data: {
-    id: string;
-    email: string;
-    name: string;
-    accessToken: string;
-    accessTokenExpiresAt: string;
-    expire?: string;
-  }
+  data?: {
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      expiresAt?: string;
+      expire?: string;
+    };
+    accessToken?: string;
+    accessTokenExpiresAt?: string | Date;
+  };
 }
 
 export interface RefreshTokenResponse {

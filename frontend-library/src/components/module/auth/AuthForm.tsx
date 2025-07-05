@@ -6,7 +6,7 @@ import { loginSchema, registerSchema } from "../../../lib/zod";
 import { useAppDispatch } from "../../hooks/useRedux";
 import { useLoginMutation, useRegisterMutation } from "../../redux/api/auth.api";
 import { getCredentials } from "../../redux/features/auth/authSlice";
-import type { User } from "../../types/auth.type";
+import type { LoginResponse, User } from "../../types/auth.type";
 import type { ApiError, AuthFormInterface, AuthFormValues, LoginValues, RegisterValues } from "../../types/form.type";
 import { Button } from "../../ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../ui/form";
@@ -50,17 +50,21 @@ export default function AuthForm({ mode }: AuthFormInterface) {
       }
       else
       {
-        const res = await login( values as LoginValues ).unwrap();
+        const res: LoginResponse = await login(values as LoginValues).unwrap();
+
+        if (!res.data || !res.data.user || !res.data.accessToken) {
+          throw new Error("Incomplete login response");
+        };
 
         const user: User = {
-          id: res.data.id,
-          email: res.data.email,
-          name: res.data.name,
+          id: res.data.user.id,
+          email: res.data.user.email,
+          name: res.data.user.name,
         };
 
         dispatch( getCredentials( {
           user,
-          accessToken: res.data.accessToken,
+          accessToken: res.data.accessToken!,
           accessTokenExpiresAt: res.data.accessTokenExpiresAt,
         } ) );
 
