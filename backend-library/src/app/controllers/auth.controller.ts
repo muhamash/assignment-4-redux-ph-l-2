@@ -84,7 +84,7 @@ export const login = async ( req: Request, res: Response, next: NextFunction ): 
         const accessToken = generateAccessToken( user.id );
         const refreshToken = generateRefreshToken( user.id );
         const expiresAt = new Date( Date.now() + 7 * 24 * 60 * 60 * 1000 );
-        const accessTokenExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
+        const accessTokenExpiresAt = new Date(Date.now() + 3 * 60 * 1000);
 
 
         await Session.create( {
@@ -97,7 +97,7 @@ export const login = async ( req: Request, res: Response, next: NextFunction ): 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000,
           }).status( 200 ).json( {
             success: true,
@@ -172,7 +172,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
         const newAccessToken = generateAccessToken( payload.id );
         const newRefreshToken = generateRefreshToken( payload.id );
         const expiresAt = new Date( Date.now() + 7 * 24 * 60 * 60 * 1000 );
-        const accessTokenExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
+        const accessTokenExpiresAt = new Date(Date.now() + 3 * 60 * 1000);
   
         await Session.findOneAndUpdate(
             { refreshToken },
@@ -182,7 +182,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
         res.cookie( "refreshToken", newRefreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         } ).status( 200 ).json( {
             success: true,
@@ -243,7 +243,7 @@ export const logoutUser = async ( req: Request, res: Response, next: NextFunctio
     res.clearCookie( "refreshToken", {
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
+        sameSite: "none",
     } );
   
     res.status( 204 ).send();

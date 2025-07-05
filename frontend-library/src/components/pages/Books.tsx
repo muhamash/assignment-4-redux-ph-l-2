@@ -35,7 +35,7 @@ export default function Books() {
   // console.log(user)
 
   const books = data?.data || undefined;
-  console.log(data, isError)
+  // console.log(data, isError)
   const meta = data?.meta;
   const totalPages = meta?.totalPages || 1;
 

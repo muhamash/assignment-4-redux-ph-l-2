@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "./useRedux";
 export const useAutoRefresh = () =>
 {
     const { accessTokenExpiresAt, user } = useAppSelector( ( state ) => state.auth );
-    console.log( accessTokenExpiresAt, user );
+    // console.log( accessTokenExpiresAt, user );
     
     const dispatch = useAppDispatch();
 
@@ -17,7 +17,7 @@ export const useAutoRefresh = () =>
         {
             const refreshResult = await dispatch(authApi.endpoints.refreshToken.initiate()).unwrap() as { data: RefreshTokenResponse };
 
-            console.log( refreshResult )
+            console.log( "handle refresh token", refreshResult )
 
             if ( refreshResult?.data )
             {

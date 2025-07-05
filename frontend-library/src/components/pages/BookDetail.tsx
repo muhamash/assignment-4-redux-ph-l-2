@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { useGetBookQuery } from "../redux/api/books.api";
 import { openBorrowModal } from "../redux/features/books/modalSlice";
-import { Button } from "../ui/button";
 import type { RootState } from "../redux/store/store";
+import { Button } from "../ui/button";
 
 export default function BookDetail() {
     const { id } = useParams();
@@ -36,7 +36,7 @@ export default function BookDetail() {
 
     const book = data.data;
     
-    console.log(user)
+    // console.log(user)
 
     return (
         <>

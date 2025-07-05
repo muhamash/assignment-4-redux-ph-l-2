@@ -8,7 +8,7 @@ export default function Hero() {
     const { data, isLoading, error: isError } = useGetBooksQuery({});
 
     const books = data?.data?.slice( 0, 6 ) || [];
-    console.log(books)
+    // console.log( books );
 
     if ( isError )
     {

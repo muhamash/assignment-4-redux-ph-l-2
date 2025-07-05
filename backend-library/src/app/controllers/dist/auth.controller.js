@@ -135,7 +135,7 @@ exports.login = function (req, res, next) { return __awaiter(void 0, void 0, Pro
                 accessToken = jwt_util_1.generateAccessToken(user.id);
                 refreshToken_1 = jwt_util_1.generateRefreshToken(user.id);
                 expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-                accessTokenExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
+                accessTokenExpiresAt = new Date(Date.now() + 3 * 60 * 1000);
                 return [4 /*yield*/, session_model_1.Session.create({
                         user: user.id,
                         refreshToken: refreshToken_1,
@@ -146,7 +146,7 @@ exports.login = function (req, res, next) { return __awaiter(void 0, void 0, Pro
                 res.cookie("refreshToken", refreshToken_1, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
-                    sameSite: "lax",
+                    sameSite: "none",
                     maxAge: 7 * 24 * 60 * 60 * 1000
                 }).status(200).json({
                     success: true,
@@ -217,14 +217,14 @@ exports.refreshToken = function (req, res, next) { return __awaiter(void 0, void
                 newAccessToken = jwt_util_1.generateAccessToken(payload.id);
                 newRefreshToken = jwt_util_1.generateRefreshToken(payload.id);
                 expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-                accessTokenExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
+                accessTokenExpiresAt = new Date(Date.now() + 3 * 60 * 1000);
                 return [4 /*yield*/, session_model_1.Session.findOneAndUpdate({ refreshToken: refreshToken_2 }, { refreshToken: newRefreshToken, expiresAt: expiresAt })];
             case 4:
                 _c.sent();
                 res.cookie("refreshToken", newRefreshToken, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
-                    sameSite: "lax",
+                    sameSite: "none",
                     maxAge: 7 * 24 * 60 * 60 * 1000
                 }).status(200).json({
                     success: true,
@@ -281,7 +281,7 @@ exports.logoutUser = function (req, res, next) { return __awaiter(void 0, void 0
                 res.clearCookie("refreshToken", {
                     httpOnly: true,
                     secure: true,
-                    sameSite: "strict"
+                    sameSite: "none"
                 });
                 res.status(204).send();
                 return [2 /*return*/];

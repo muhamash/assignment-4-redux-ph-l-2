@@ -10,7 +10,7 @@ const Nav = () => {
     const dispatch = useAppDispatch();
     const location = useLocation();
 
-    console.log(user)
+    // console.log(user)
 
     // console.log(user)
     const navigate = useNavigate();
