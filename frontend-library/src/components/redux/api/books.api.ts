@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { BookQueryParams, IBook, IBorrowSummaryItem, ICreateBookInput, IPaginationMeta, IUpdateBookInput } from "../../types/books.type";
+import type { RootState } from "../store/store";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -10,7 +11,7 @@ export const booksApi = createApi( {
         credentials: "include",
         prepareHeaders: ( headers, { getState } ) =>
         {
-            const token = ( getState() as never ).auth.accessToken;
+            const token = ( getState() as RootState ).auth.accessToken;
             // console.log(token)
             if ( token )
             {

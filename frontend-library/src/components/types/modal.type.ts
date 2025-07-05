@@ -7,7 +7,7 @@ export interface ModalState {
     };
 };  
 
-export interface BorrowFormValues {
-    quantity: number;
-    dueDate: string;
+export interface BorrowModalBook extends IBook {
+    quantity?: number;
+    dueDate?: string;
 };

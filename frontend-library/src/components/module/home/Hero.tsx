@@ -1,14 +1,26 @@
-import { Book } from 'lucide-react';
+import { Book, Loader2 } from 'lucide-react';
 import { Link } from 'react-router';
 import BookCard from '../../layouts/BookCard';
 import { useGetBooksQuery } from '../../redux/api/books.api';
 import type { IBook } from '../../types/books.type';
 
 export default function Hero() {
-    const { data, isLoading, isError } = useGetBooksQuery(undefined);
+    const { data, isLoading, error: isError } = useGetBooksQuery({});
 
     const books = data?.data?.slice( 0, 6 ) || [];
     // console.log(books)
+
+    if ( isError )
+    {
+        let errorMessage = "Unexpected error";
+        if (isError && "status" in isError && isError.data) {
+            errorMessage = JSON.stringify(isError.data);
+        }
+
+        return <p className="text-red-300">Failed to load books. Please try again; {errorMessage}.</p>;
+        
+
+    };
 
     return (
         <section className="bg-sky-800 py-20 flex flex-col items-center justify-center gap-10">
@@ -26,11 +38,10 @@ export default function Hero() {
             </div>
 
             {isLoading && (
-                <p className="text-primary-foreground">Loading books...</p>
-            )}
-
-            {isError && (
-                <p className="text-red-300">Failed to load books. Please try again.</p>
+                <div className="flex justify-center items-center h-screen">
+                    <Loader2 className="animate-spin w-10 h-10 text-gray-500" />
+                    <span className="ml-3 text-lg text-white">Loading books...</span>
+                </div>
             )}
 
             {!isLoading && !isError && (
@@ -42,7 +53,7 @@ export default function Hero() {
             )}
 
             {
-                books?.length === 0 && (
+                books?.length === 0 && !isLoading && !isError && (
                     <div>
                         Empty database!!!
                     </div>

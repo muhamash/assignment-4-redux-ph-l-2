@@ -40,8 +40,8 @@ export interface ICreateBookInput {
   isbn: string;
   description?: string;
   copies?: number;
-  createdBy: string; 
-  available: boolean;
+  createdBy?: string; 
+  available?: boolean;
 }
 
 export interface IUpdateBookInput {
@@ -55,9 +55,17 @@ export interface IUpdateBookInput {
 }
 
 export interface IBorrowSummaryItem {
-  bookId: string;
-  title: string;
+  book: {
+    title: string;
+    isbn: string;
+  };
   totalQuantity: number;
+  users: {
+    id: string;
+    name: string;
+    email: string;
+    quantity: number;
+  }[];
 }
 
 export interface PaginationState {

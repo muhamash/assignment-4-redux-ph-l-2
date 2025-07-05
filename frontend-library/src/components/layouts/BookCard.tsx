@@ -1,10 +1,11 @@
-import type { RootState } from "@reduxjs/toolkit/query";
 import { Book, EditIcon, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { isFetchBaseQueryError } from "../guard/TypeGuards";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { useDeleteBookMutation } from "../redux/api/books.api";
 import { openBorrowModal, openEditModal } from "../redux/features/books/modalSlice";
+import type { RootState } from "../redux/store/store";
 import type { IBook } from "../types/books.type";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -22,55 +23,44 @@ export default function BookCard ( { book }: { book: IBook } )
 
     const handleDelete = ( bookId: string ) =>
     {
-        let localLoading = false;
-    
-        toast(
-            ( t ) =>
-            {
-                return (
-                    <div className="space-y-2 w-full">
-                        <p className="text-rose-600 text-lg">Are you sure you want to delete this book?</p>
-                        <div className="flex gap-2">
-                            <Button
-                                size="sm"
-                                variant="destructive"
-                                disabled={localLoading}
-                                onClick={async () =>
-                                {
-                                    localLoading = true;
-                                    try
-                                    {
-                                        await deleteBook( bookId ).unwrap();
-                                        toast.dismiss( t );
-                                        toast.success( "Book deleted successfully" );
-                                    }
-                                    catch ( error: unknown )
-                                    {
-                                        toast.dismiss( t );
-                                        // Show backend error message if available
-                                        const msg = error?.data?.message || "Failed to delete book";
-                                        toast.error( msg );
-                                    }
-                                }}
-                            >
-                                {localLoading ? "Deleting..." : "Confirm"}
-                            </Button>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => toast.dismiss( t )}
-                                disabled={localLoading}
-                            >
-                                Cancel
-                            </Button>
-                        </div>
-                    </div>
-                );
-            },
-            {
-                duration: Infinity,
-            }
-        );
+        toast.custom( ( t ) => (
+            <div className="space-y-2 w-full">
+                <p className="text-rose-600 text-lg">Are you sure you want to delete this book?</p>
+                <div className="flex gap-2">
+                    <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={async () =>
+                        {
+                            try
+                            {
+                                await deleteBook( bookId ).unwrap();
+                                toast.dismiss( t );
+                                toast.success( "Book deleted successfully" );
+                            } catch ( error: unknown )
+                            {
+                                toast.dismiss( t );
+                                const msg = isFetchBaseQueryError( error ) && error.data && typeof error.data === "object"
+                                    ? ( error.data as { message?: string } ).message
+                                    : "unknown error!!";
+                                
+                                toast.error( msg );
+                            }
+                        }}
+                    >
+                        Confirm
+                    </Button>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toast.dismiss( t )}
+                    >
+                        Cancel
+                    </Button>
+                </div>
+            </div>
+        ) );
+        
     };
 
     return (
@@ -81,7 +71,7 @@ export default function BookCard ( { book }: { book: IBook } )
                         <CardTitle className="text-md text-sky-800 mb-2">{book.title}</CardTitle>
                         <p className="text-sm text-muted-foreground">by {book.author}</p>
                         <p className="text-xs text-violet-600">
-                            Created by: {book.createdBy.name}
+                            Created by: {book.createdBy?.name}
                         </p>
                     </div>
                     <Book className="w-6 h-6 text-primary flex-shrink-0" />
@@ -92,7 +82,7 @@ export default function BookCard ( { book }: { book: IBook } )
                 <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Genre:</span>
-                        <Badge variant="primary">{book.genre}</Badge>
+                        <Badge variant="secondary">{book.genre}</Badge>
                     </div>
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">ISBN:</span>
@@ -108,7 +98,7 @@ export default function BookCard ( { book }: { book: IBook } )
                 {/* Actions */}
                 <div className="flex flex-wrap gap-2">
                     {
-                        user?.id === book.createdBy.id && user?.id && (
+                        user?.id === book.createdBy?.id && user?.id && (
                             <>
                                 <Button
                                     variant="ghost"
@@ -121,7 +111,7 @@ export default function BookCard ( { book }: { book: IBook } )
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => handleDelete( book.id )}
+                                    onClick={() => handleDelete( book.id! )}
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </Button>
@@ -130,10 +120,12 @@ export default function BookCard ( { book }: { book: IBook } )
                     }
                     <>
                         <Button
-                            disabled={!book?.available || user?.id === book.createdBy.id || !user?.id}
+                            disabled={!book?.available || user?.id === book.createdBy?.id || !user?.id}
                             variant="outline"
                             size="sm"
-                            onClick={() => dispatch( openBorrowModal( book ) )}
+                            onClick={
+                                () => dispatch( openBorrowModal( { ...book, quantity: 1, dueDate: new Date().toISOString() } ) )
+                            }
                         >
                             Borrow
                         </Button>

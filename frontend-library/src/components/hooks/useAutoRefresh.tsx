@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { authApi } from "../redux/api/auth.api";
 import { getCredentials, logout } from "../redux/features/auth/authSlice";
+import type { RefreshTokenResponse } from "../types/auth.type";
 import { useAppDispatch, useAppSelector } from "./useRedux";
 
 export const useAutoRefresh = () =>
@@ -14,7 +15,7 @@ export const useAutoRefresh = () =>
     {
         try
         {
-            const refreshResult = await dispatch( authApi.endpoints.refreshToken.initiate() ).unwrap();
+            const refreshResult = await dispatch(authApi.endpoints.refreshToken.initiate()).unwrap() as { data: RefreshTokenResponse };
 
             console.log( refreshResult?.data )
 

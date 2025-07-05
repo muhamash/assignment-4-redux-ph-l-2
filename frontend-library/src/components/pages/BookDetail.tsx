@@ -87,7 +87,7 @@ export default function BookDetail() {
 
                 <div className="flex space-x-4 mt-10">
                     <Button
-                        disabled={!book?.available || user?.id === book.createdBy.id || !user?.id}
+                        disabled={!book?.available || user?.id === book?.createdBy?.id || !user?.id}
                         onClick={() => dispatch( openBorrowModal( book ) )}
                     >
                         Borrow This Book

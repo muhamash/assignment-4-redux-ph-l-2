@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { allowedGenres, zodBookSchema, zodUpdateBookSchema } from "../../../lib/zod";
+import { isFetchBaseQueryError } from "../../guard/TypeGuards";
 import { useAppDispatch } from "../../hooks/useRedux";
 import
     {
@@ -34,7 +35,9 @@ import
     } from "../../ui/select";
 import { Textarea } from "../../ui/textarea";
 
-type BookFormValues = z.infer<typeof zodBookSchema>;
+
+export type BookFormValues = z.infer<typeof zodBookSchema>;
+export type UpdateBookValues = z.infer<typeof zodUpdateBookSchema>;
 
 interface BookFormProps {
   mode?: "edit";
@@ -52,58 +55,58 @@ export default function BookForm({ mode, book }: BookFormProps) {
 
     const navigate = useNavigate()
 
-    const form = useForm<BookFormValues>( {
+    type SchemaType = typeof schema extends z.ZodTypeAny ? z.infer<typeof schema> : never;
+    const form = useForm<SchemaType>( {
         resolver: zodResolver( schema ),
         defaultValues: {
-            title: book?.title || "",
-            author: book?.author || "",
-            genre: book?.genre || "",
-            isbn: book?.isbn || "",
-            description: book?.description || "",
-            copies: book?.copies || "",
-            available: book?.available || false,
+            title: book?.title ?? "",
+            author: book?.author ?? "",
+            genre: book?.genre ?? "",
+            isbn: book?.isbn ?? "",
+            description: book?.description ?? "",
+            copies: book?.copies ?? 0,
+            available: book?.available ?? false,
         },
-    } );
+    } );      
 
-    const onSubmit = async ( data: BookFormValues ) =>
+    const onSubmit = async ( data: SchemaType ) =>
     {
         try
         {
             if ( isEdit && book?.id )
             {
-                const res = await updateBook( { id: book.id, body: data } ).unwrap();
+                const res = await updateBook( { id: book.id, body: data as UpdateBookValues } ).unwrap();
                 if ( res?.success )
                 {
                     toast.success( "Book updated successfully!" );
-                }
-                else
+                } else
                 {
-                    toast.error( `Book updates error! ${ res?.error?.message }` );
+                    toast.error( `Book update error!` );
                 }
-            }
-            else
+            } else
             {
-                const res = await createBook( data ).unwrap();
+                const res = await createBook( data as BookFormValues ).unwrap();
                 if ( res?.success )
                 {
                     toast.success( "Book created successfully!" );
                 }
-                else
-                {
-                    toast.error( `Book creates error! ${ res?.error?.message }` );
-                }
-          
-                navigate( "/books" )
+                navigate( "/books" );
             }
-
             dispatch( closeEditModal() );
             form.reset();
-        } catch ( err: unknown )
-        {
-            const errMsg = err?.data?.message || "An error occurred.";
-            toast.error( errMsg );
         }
-    };
+        catch ( error: unknown )
+        {
+            const apiError =
+                isFetchBaseQueryError( error ) && error.data && typeof error.data === "object"
+                    ? ( error.data as { message?: string } ).message
+                    : "Unknown error";
+                    
+            toast.error( "Failed!", {
+                description: apiError ?? "Unknown error",
+            } );
+        }
+    };  
 
     const isSubmitting = isEdit ? isUpdateLoading : isCreateLoading;
     const currentError = isEdit ? updateError : createError;

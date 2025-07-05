@@ -14,7 +14,7 @@ export default function EditModal ()
         <Dialog open={isOpen} onOpenChange={( open ) => !open && dispatch( closeEditModal() )}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogTitle>Editing : {book?.title}</DialogTitle>
-                <BookForm book={book} mode={ "edit" } />
+                <BookForm book={book ?? undefined} mode="edit" />
             </DialogContent>
         </Dialog>
     );

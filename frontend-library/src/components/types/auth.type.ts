@@ -11,3 +11,23 @@ export interface AuthState {
   accessToken: string | null;
   accessTokenExpiresAt: string | Date | undefined | null;
 }
+
+export interface LoginResponse {
+  id: string;
+  email: string;
+  name: string;
+  accessToken: string;
+  accessTokenExpiresAt: string | Date;
+}
+
+export interface RefreshTokenResponse {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    expiresAt?: string;
+    expire?: string;
+  };
+  accessToken: string;
+  accessTokenExpiresAt: string | Date;
+}

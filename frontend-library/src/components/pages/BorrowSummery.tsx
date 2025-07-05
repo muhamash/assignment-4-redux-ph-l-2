@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useGetBorrowSummaryQuery } from "../redux/api/books.api";
+import type { IBorrowSummaryItem } from "../types/books.type";
 import { Badge } from "../ui/badge";
 import { Card, CardContent } from "../ui/card";
 import
@@ -38,14 +39,17 @@ export default function BorrowSummary() {
   }
 
   if (error) {
-    return <p className="text-red-500 text-center">Error fetching summary.{ error?.message}</p>;
+    const errorMessage =
+      "status" in error
+        ? JSON.stringify(error.data) || "Unknown error"
+        : error?.message || "Unknown error";
+  
+    return <p className="text-red-500 text-center">Error fetching summary. {errorMessage}</p>;
   }
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold my-10 text-center">Borrow Summary</h1>
-
-      
+      <h1 className="text-2xl font-bold my-10 text-center font-serif">Borrow Summary</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {data?.data?.map((item, index) => (
@@ -57,7 +61,7 @@ export default function BorrowSummary() {
 
               <div className="border-t pt-2 mt-2">
                 <p className="font-semibold text-sm mb-1">Borrowers:</p>
-                {item.users.map((user) => (
+                {item.users.map((user : IBorrowSummaryItem["users"][0]) => (
                   <ul key={user.id} className="text-sm">
                     <span className="font-medium text-violet-700">{user.name}</span> ({user.email}) - <Badge variant={"outline"}>{user.quantity}</Badge>
                   </ul>

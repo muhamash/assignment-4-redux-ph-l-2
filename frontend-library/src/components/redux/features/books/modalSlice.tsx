@@ -1,7 +1,7 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import type { IBook } from "../../../types/books.type";
-import type { BorrowFormValues, ModalState } from "../../../types/modal.type";
+import type { BorrowModalBook, ModalState } from "../../../types/modal.type";
 
 const initialState: ModalState = {
   editModal: {
@@ -18,7 +18,7 @@ export const modalSlice = createSlice({
   name: "modal",
   initialState,
   reducers: {
-    openBorrowModal: (state, action: PayloadAction<BorrowFormValues>) => {
+    openBorrowModal: (state, action: PayloadAction<BorrowModalBook>) => {
       state.borrowModal.isOpen = true;
       state.borrowModal.book = action.payload;
     },

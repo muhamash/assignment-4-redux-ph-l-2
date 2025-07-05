@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import BookCard from "../layouts/BookCard";
 import { useGetBooksQuery } from "../redux/api/books.api";
@@ -23,7 +24,7 @@ export default function Books() {
 
   const userId = tab === "my" ? user?.id : undefined;
 
-  const { data, isLoading, error:isError } = useGetBooksQuery( {
+  const { data, isLoading, error: isError } = useGetBooksQuery( {
     page: String( page ),
     limit: String( limit ),
     userId,
@@ -38,17 +39,31 @@ export default function Books() {
   const meta = data?.meta;
   const totalPages = meta?.totalPages || 1;
 
-  const handleNext = () => {
+  const handleNext = () : void => {
     if (page < totalPages) dispatch(setPage(page + 1));
   };
 
-  const handlePrevious = () => {
+  const handlePrevious = () : void => {
     if (page > 1) dispatch(setPage(page - 1));
   };
 
-  const handleTabChange = (value: "all" | "my"): void => {
-    dispatch(setTab(value));
+  const handleTabChange = ( value: string ): void =>
+  {
+    if ( value === "all" || value === "my" )
+    {
+      dispatch( setTab( value ) );
+    }
   };
+
+  if ( isError )
+  {
+    const errorMessage =
+      isError && "status" in isError && isError.data
+    ? JSON.stringify(isError.data)
+    : "Unexpected error";
+
+    return (<p className="text-red-300">{errorMessage}</p>)
+  }
 
   return (
     <div className="bg-gray-100 py-20 flex flex-col items-center justify-center gap-10">
@@ -63,20 +78,24 @@ export default function Books() {
         </Tabs>
       )}
 
-      {isLoading && <p className="text-primary-foreground">Loading books...</p>}
-      {isError && <p className="text-red-300">{isError?.data?.message}</p>}
+      {isLoading && <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin w-10 h-10 text-gray-500" />
+        <span className="ml-3 text-lg text-black">Loading books...</span>
+      </div>}
+      
 
       {!isLoading && !isError && books?.length === 0 && (
         <div className="text-white">No books found!</div>
       )}
 
-      {!isLoading && !isError && books?.length > 0 && (
+      {!isLoading && !isError && ( books?.length ?? 0 ) > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
-          {books?.map((book: IBook) => (
-            <BookCard key={book?.id} book={book} />
-          ))}
+          {books?.map( ( book: IBook ) => (
+            <BookCard key={book.id} book={book} />
+          ) )}
         </div>
       )}
+
 
       {totalPages > 1 && (
         <Pagination className="mt-8">
@@ -84,7 +103,8 @@ export default function Books() {
             <PaginationItem>
               <PaginationPrevious
                 href="#"
-                onClick={(e) => {
+                onClick={( e ) =>
+                {
                   e.preventDefault();
                   handlePrevious();
                 }}
@@ -92,30 +112,31 @@ export default function Books() {
               />
             </PaginationItem>
 
-            {Array.from({ length: totalPages }, (_, i) => (
+            {Array.from( { length: totalPages }, ( _, i ) => (
               <PaginationItem key={i}>
                 <PaginationLink
                   href="#"
-                  onClick={(e) => {
+                  onClick={( e ) =>
+                  {
                     e.preventDefault();
-                    dispatch(setPage(i + 1));
+                    dispatch( setPage( i + 1 ) );
                   }}
                   isActive={i + 1 === page}
-                  className={`${
-                    i + 1 === page ? "bg-primary text-white" : "hover:bg-primary/20"
-                  } transition-colors`}
+                  className={`${ i + 1 === page ? "bg-primary text-white" : "hover:bg-primary/20"
+                    } transition-colors`}
                 >
                   {i + 1}
                 </PaginationLink>
               </PaginationItem>
-            ))}
+            ) )}
 
             {totalPages > 5 && <PaginationEllipsis />}
 
             <PaginationItem>
               <PaginationNext
                 href="#"
-                onClick={(e) => {
+                onClick={( e ) =>
+                {
                   e.preventDefault();
                   handleNext();
                 }}

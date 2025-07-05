@@ -4,12 +4,12 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { cn } from "../../lib/utils";
 import { zodBorrowSchema } from "../../lib/zod";
+import { isFetchBaseQueryError } from "../guard/TypeGuards";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { useBorrowBookMutation } from "../redux/api/books.api";
 import { closeBorrowModal } from "../redux/features/books/modalSlice";
 import type { RootState } from "../redux/store/store";
-import type { ApiError } from "../types/form.type";
-import type { BorrowFormValues } from "../types/modal.type";
+import type { BorrowModalBook } from "../types/modal.type";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle } from "../ui/dialog";
@@ -26,14 +26,14 @@ export default function BorrowModal ()
 
     const [ borrowBook, {data, isLoading, error } ] = useBorrowBookMutation();
 
-    const form = useForm<BorrowFormValues>( {
+    const form = useForm<BorrowModalBook>( {
         defaultValues: {
             quantity: 1,
             dueDate: undefined,
         },
     } );
 
-    const onSubmit = async ( data: BorrowFormValues ) =>
+    const onSubmit = async ( data: BorrowModalBook ) =>
     {
         if ( !book ) return;
       
@@ -57,30 +57,38 @@ export default function BorrowModal ()
             {
                 toast.success( "Success!", {
                     description: `You have borrowed "${ book.title }" successfully.`,
-                } );              
+                } );
           
                 dispatch( closeBorrowModal() );
-                form.reset(); 
+                form.reset();
             }
             else
             {
                 toast.error( "Failed!", {
                     description: `Failed to borrow the book.`,
-                } ); 
+                } );
             }
         }
         catch ( error: unknown )
         {
-            console.log(error.message)
+            const apiError =
+                isFetchBaseQueryError( error ) && error.data && typeof error.data === "object"
+                    ? ( error.data as { message?: string } ).message
+                    : "Unknown error";
+        
             toast.error( "Failed!", {
-                description: `Failed to borrow the book. Please try again; ${error?.message || error?.data?.message}`,
-            } );              
-        }
-    };      
+                description: apiError ?? "Unknown error",
+            } );
+        }  
+    };    
 
     if ( !book ) return null;
 
-    const apiError = error?.data?.message as ApiError;
+    const apiError =
+                isFetchBaseQueryError( error ) && error.data && typeof error.data === "object"
+                    ? ( error.data as { message?: string } ).message
+                    : "unknown error!!";
+
 
     console.log( apiError, error, data, "borrow modal" );
 
@@ -146,7 +154,7 @@ export default function BorrowModal ()
                                         <PopoverContent className="w-auto p-0" align="start">
                                             <Calendar
                                                 mode="single"
-                                                selected={field.value}
+                                                selected={field.value ? new Date(field.value) : undefined}
                                                 onSelect={field.onChange}
                                                 captionLayout="dropdown"
                                                 initialFocus
