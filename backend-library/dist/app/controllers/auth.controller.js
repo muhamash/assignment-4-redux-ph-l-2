@@ -72,7 +72,8 @@ const login = async (req, res, next) => {
         const accessToken = (0, jwt_util_1.generateAccessToken)(user.id);
         const refreshToken = (0, jwt_util_1.generateRefreshToken)(user.id);
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        const accessTokenExpiresAt = new Date(Date.now() + 3 * 60 * 1000);
+        const accessTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000);
+        await session_model_1.Session.deleteMany({ user: user.id });
         await session_model_1.Session.create({
             user: user.id,
             refreshToken,
@@ -81,18 +82,20 @@ const login = async (req, res, next) => {
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "none",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         }).status(200).json({
             success: true,
             message: "Login successful",
             data: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                },
                 accessToken,
                 accessTokenExpiresAt,
-                expire: "2 mints only"
+                expire: "1 minute only"
             },
         });
     }
@@ -125,42 +128,96 @@ const login = async (req, res, next) => {
 exports.login = login;
 const refreshToken = async (req, res, next) => {
     try {
+        console.log("Refresh token request received");
+        console.log("Cookies:", req.cookies);
         if (!req.cookies || !req.cookies.refreshToken) {
-            res.status(401).json({ message: "No refresh token found in cookies" });
+            console.log("No refresh token found in cookies");
+            res.status(401).json({
+                success: false,
+                message: "No refresh token found in cookies"
+            });
             return;
         }
         const { refreshToken } = await zods_util_1.zodRefreshTokenSchema.parseAsync({
             refreshToken: req.cookies.refreshToken,
         });
+        console.log("Looking for session with refresh token:", refreshToken);
         const session = await session_model_1.Session.findOne({ refreshToken });
+        console.log("Found session:", session);
         if (!session) {
-            res.status(403).json({ message: "Invalid session", status: 403 });
+            console.log("No session found for refresh token");
+            res.status(403).json({
+                success: false,
+                message: "Invalid session",
+                status: 403
+            });
             return;
         }
-        const payload = jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        // Check if session has expired
+        if (session.expiresAt && new Date() > session.expiresAt) {
+            console.log("Session has expired");
+            await session_model_1.Session.findOneAndDelete({ refreshToken });
+            res.status(403).json({
+                success: false,
+                message: "Session expired",
+                status: 403
+            });
+            return;
+        }
+        let payload;
+        try {
+            payload = jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+            console.log("JWT payload:", payload);
+        }
+        catch (jwtError) {
+            console.log("JWT verification failed:", jwtError);
+            await session_model_1.Session.findOneAndDelete({ refreshToken });
+            res.status(403).json({
+                success: false,
+                message: "Invalid refresh token",
+                status: 403
+            });
+            return;
+        }
         const user = await user_model_1.User.findById(payload.id).select("-password");
+        if (!user) {
+            console.log("User not found for ID:", payload.id);
+            await session_model_1.Session.findOneAndDelete({ refreshToken });
+            res.status(403).json({
+                success: false,
+                message: "User not found",
+                status: 403
+            });
+            return;
+        }
         const newAccessToken = (0, jwt_util_1.generateAccessToken)(payload.id);
         const newRefreshToken = (0, jwt_util_1.generateRefreshToken)(payload.id);
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        const accessTokenExpiresAt = new Date(Date.now() + 3 * 60 * 1000);
+        const accessTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000);
+        // Update the session with new refresh token
         await session_model_1.Session.findOneAndUpdate({ refreshToken }, { refreshToken: newRefreshToken, expiresAt });
         res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "none",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         }).status(200).json({
             success: true,
             message: "Access token successfully retrieved",
             data: {
-                user,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                },
                 accessToken: newAccessToken,
                 accessTokenExpiresAt,
-                expire: "2 minutes only",
+                expire: "1 minute only",
             },
         });
     }
     catch (error) {
+        console.log("Refresh token error:", error);
         if (error instanceof Error) {
             const message = error.name === "ZodError"
                 ? error.issues?.[0]?.message || "Validation error"
@@ -186,20 +243,32 @@ const refreshToken = async (req, res, next) => {
 };
 exports.refreshToken = refreshToken;
 const logoutUser = async (req, res, next) => {
-    const { refreshToken } = await zods_util_1.zodRefreshTokenSchema.parseAsync({
-        refreshToken: req.cookies.refreshToken,
-    });
-    const session = await session_model_1.Session.findOne({ refreshToken });
-    if (!session) {
-        res.status(403).json({ message: "Invalid session", status: 403 });
-        return;
+    try {
+        const { refreshToken } = await zods_util_1.zodRefreshTokenSchema.parseAsync({
+            refreshToken: req.cookies.refreshToken,
+        });
+        const session = await session_model_1.Session.findOne({ refreshToken });
+        if (!session) {
+            res.status(403).json({ message: "Invalid session", status: 403 });
+            return;
+        }
+        await session_model_1.Session.findOneAndDelete({ refreshToken });
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        });
+        res.status(200).json({
+            success: true,
+            message: "Logged out successfully"
+        });
     }
-    // await Session.findOneAndDelete( { refreshToken } );
-    res.clearCookie("refreshToken", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-    });
-    res.status(204).send();
+    catch (error) {
+        console.error("Logout error:", error);
+        res.status(500).json({
+            success: false,
+            message: "An error occurred during logout",
+        });
+    }
 };
 exports.logoutUser = logoutUser;

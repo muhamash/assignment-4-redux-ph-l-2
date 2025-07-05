@@ -108,7 +108,7 @@ exports.login = function (req, res, next) { return __awaiter(void 0, void 0, Pro
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
-                _c.trys.push([0, 5, , 6]);
+                _c.trys.push([0, 6, , 7]);
                 return [4 /*yield*/, zods_util_1.zodLoginSchema.parseAsync(req.body)];
             case 1:
                 zodLogin = _c.sent();
@@ -135,33 +135,38 @@ exports.login = function (req, res, next) { return __awaiter(void 0, void 0, Pro
                 accessToken = jwt_util_1.generateAccessToken(user.id);
                 refreshToken_1 = jwt_util_1.generateRefreshToken(user.id);
                 expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-                accessTokenExpiresAt = new Date(Date.now() + 3 * 60 * 1000);
+                accessTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000);
+                return [4 /*yield*/, session_model_1.Session.deleteMany({ user: user.id })];
+            case 4:
+                _c.sent();
                 return [4 /*yield*/, session_model_1.Session.create({
                         user: user.id,
                         refreshToken: refreshToken_1,
                         expiresAt: expiresAt
                     })];
-            case 4:
+            case 5:
                 _c.sent();
                 res.cookie("refreshToken", refreshToken_1, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
-                    sameSite: "none",
+                    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
                     maxAge: 7 * 24 * 60 * 60 * 1000
                 }).status(200).json({
                     success: true,
                     message: "Login successful",
                     data: {
-                        id: user.id,
-                        email: user.email,
-                        name: user.name,
+                        user: {
+                            id: user.id,
+                            email: user.email,
+                            name: user.name
+                        },
                         accessToken: accessToken,
                         accessTokenExpiresAt: accessTokenExpiresAt,
-                        expire: "2 mints only"
+                        expire: "1 minute only"
                     }
                 });
-                return [3 /*break*/, 6];
-            case 5:
+                return [3 /*break*/, 7];
+            case 6:
                 error_2 = _c.sent();
                 if (error_2 instanceof Error) {
                     message = helpers_util_1.isZodError(error_2) ? ((_b = (_a = error_2.issue) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.message) || "Validation error"
@@ -182,20 +187,26 @@ exports.login = function (req, res, next) { return __awaiter(void 0, void 0, Pro
                         stack: "No stack trace available"
                     });
                 }
-                return [3 /*break*/, 6];
-            case 6: return [2 /*return*/];
+                return [3 /*break*/, 7];
+            case 7: return [2 /*return*/];
         }
     });
 }); };
 exports.refreshToken = function (req, res, next) { return __awaiter(void 0, void 0, Promise, function () {
-    var refreshToken_2, session, payload, user, newAccessToken, newRefreshToken, expiresAt, accessTokenExpiresAt, error_3, message;
+    var refreshToken_2, session, payload, jwtError_1, user, newAccessToken, newRefreshToken, expiresAt, accessTokenExpiresAt, error_3, message;
     var _a, _b;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
-                _c.trys.push([0, 5, , 6]);
+                _c.trys.push([0, 13, , 14]);
+                console.log("Refresh token request received");
+                console.log("Cookies:", req.cookies);
                 if (!req.cookies || !req.cookies.refreshToken) {
-                    res.status(401).json({ message: "No refresh token found in cookies" });
+                    console.log("No refresh token found in cookies");
+                    res.status(401).json({
+                        success: false,
+                        message: "No refresh token found in cookies"
+                    });
                     return [2 /*return*/];
                 }
                 return [4 /*yield*/, zods_util_1.zodRefreshTokenSchema.parseAsync({
@@ -203,42 +214,98 @@ exports.refreshToken = function (req, res, next) { return __awaiter(void 0, void
                     })];
             case 1:
                 refreshToken_2 = (_c.sent()).refreshToken;
+                console.log("Looking for session with refresh token:", refreshToken_2);
                 return [4 /*yield*/, session_model_1.Session.findOne({ refreshToken: refreshToken_2 })];
             case 2:
                 session = _c.sent();
+                console.log("Found session:", session);
                 if (!session) {
-                    res.status(403).json({ message: "Invalid session", status: 403 });
+                    console.log("No session found for refresh token");
+                    res.status(403).json({
+                        success: false,
+                        message: "Invalid session",
+                        status: 403
+                    });
                     return [2 /*return*/];
                 }
-                payload = jsonwebtoken_1["default"].verify(refreshToken_2, process.env.REFRESH_TOKEN_SECRET);
-                return [4 /*yield*/, user_model_1.User.findById(payload.id).select("-password")];
+                if (!(session.expiresAt && new Date() > session.expiresAt)) return [3 /*break*/, 4];
+                console.log("Session has expired");
+                return [4 /*yield*/, session_model_1.Session.findOneAndDelete({ refreshToken: refreshToken_2 })];
             case 3:
+                _c.sent();
+                res.status(403).json({
+                    success: false,
+                    message: "Session expired",
+                    status: 403
+                });
+                return [2 /*return*/];
+            case 4:
+                payload = void 0;
+                _c.label = 5;
+            case 5:
+                _c.trys.push([5, 6, , 8]);
+                payload = jsonwebtoken_1["default"].verify(refreshToken_2, process.env.REFRESH_TOKEN_SECRET);
+                console.log("JWT payload:", payload);
+                return [3 /*break*/, 8];
+            case 6:
+                jwtError_1 = _c.sent();
+                console.log("JWT verification failed:", jwtError_1);
+                return [4 /*yield*/, session_model_1.Session.findOneAndDelete({ refreshToken: refreshToken_2 })];
+            case 7:
+                _c.sent();
+                res.status(403).json({
+                    success: false,
+                    message: "Invalid refresh token",
+                    status: 403
+                });
+                return [2 /*return*/];
+            case 8: return [4 /*yield*/, user_model_1.User.findById(payload.id).select("-password")];
+            case 9:
                 user = _c.sent();
+                if (!!user) return [3 /*break*/, 11];
+                console.log("User not found for ID:", payload.id);
+                return [4 /*yield*/, session_model_1.Session.findOneAndDelete({ refreshToken: refreshToken_2 })];
+            case 10:
+                _c.sent();
+                res.status(403).json({
+                    success: false,
+                    message: "User not found",
+                    status: 403
+                });
+                return [2 /*return*/];
+            case 11:
                 newAccessToken = jwt_util_1.generateAccessToken(payload.id);
                 newRefreshToken = jwt_util_1.generateRefreshToken(payload.id);
                 expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-                accessTokenExpiresAt = new Date(Date.now() + 3 * 60 * 1000);
+                accessTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000);
+                // Update the session with new refresh token
                 return [4 /*yield*/, session_model_1.Session.findOneAndUpdate({ refreshToken: refreshToken_2 }, { refreshToken: newRefreshToken, expiresAt: expiresAt })];
-            case 4:
+            case 12:
+                // Update the session with new refresh token
                 _c.sent();
                 res.cookie("refreshToken", newRefreshToken, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
-                    sameSite: "none",
+                    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
                     maxAge: 7 * 24 * 60 * 60 * 1000
                 }).status(200).json({
                     success: true,
                     message: "Access token successfully retrieved",
                     data: {
-                        user: user,
+                        user: {
+                            id: user.id,
+                            email: user.email,
+                            name: user.name
+                        },
                         accessToken: newAccessToken,
                         accessTokenExpiresAt: accessTokenExpiresAt,
-                        expire: "2 minutes only"
+                        expire: "1 minute only"
                     }
                 });
-                return [3 /*break*/, 6];
-            case 5:
+                return [3 /*break*/, 14];
+            case 13:
                 error_3 = _c.sent();
+                console.log("Refresh token error:", error_3);
                 if (error_3 instanceof Error) {
                     message = error_3.name === "ZodError"
                         ? ((_b = (_a = error_3.issues) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.message) || "Validation error"
@@ -256,35 +323,51 @@ exports.refreshToken = function (req, res, next) { return __awaiter(void 0, void
                         error: error_3
                     });
                 }
-                return [3 /*break*/, 6];
-            case 6: return [2 /*return*/];
+                return [3 /*break*/, 14];
+            case 14: return [2 /*return*/];
         }
     });
 }); };
 exports.logoutUser = function (req, res, next) { return __awaiter(void 0, void 0, Promise, function () {
-    var refreshToken, session;
+    var refreshToken_3, session, error_4;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, zods_util_1.zodRefreshTokenSchema.parseAsync({
-                    refreshToken: req.cookies.refreshToken
-                })];
+            case 0:
+                _a.trys.push([0, 4, , 5]);
+                return [4 /*yield*/, zods_util_1.zodRefreshTokenSchema.parseAsync({
+                        refreshToken: req.cookies.refreshToken
+                    })];
             case 1:
-                refreshToken = (_a.sent()).refreshToken;
-                return [4 /*yield*/, session_model_1.Session.findOne({ refreshToken: refreshToken })];
+                refreshToken_3 = (_a.sent()).refreshToken;
+                return [4 /*yield*/, session_model_1.Session.findOne({ refreshToken: refreshToken_3 })];
             case 2:
                 session = _a.sent();
                 if (!session) {
                     res.status(403).json({ message: "Invalid session", status: 403 });
                     return [2 /*return*/];
                 }
-                // await Session.findOneAndDelete( { refreshToken } );
+                return [4 /*yield*/, session_model_1.Session.findOneAndDelete({ refreshToken: refreshToken_3 })];
+            case 3:
+                _a.sent();
                 res.clearCookie("refreshToken", {
                     httpOnly: true,
-                    secure: true,
-                    sameSite: "none"
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
                 });
-                res.status(204).send();
-                return [2 /*return*/];
+                res.status(200).json({
+                    success: true,
+                    message: "Logged out successfully"
+                });
+                return [3 /*break*/, 5];
+            case 4:
+                error_4 = _a.sent();
+                console.error("Logout error:", error_4);
+                res.status(500).json({
+                    success: false,
+                    message: "An error occurred during logout"
+                });
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };

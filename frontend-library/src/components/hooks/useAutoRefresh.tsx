@@ -1,25 +1,27 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { authApi } from "../redux/api/auth.api";
 import { getCredentials, logout } from "../redux/features/auth/authSlice";
-import type { RefreshTokenResponse } from "../types/auth.type";
 import { useAppDispatch, useAppSelector } from "./useRedux";
 
 export const useAutoRefresh = () =>
 {
     const { accessTokenExpiresAt, user } = useAppSelector( ( state ) => state.auth );
-    // console.log( accessTokenExpiresAt, user );
-    
     const dispatch = useAppDispatch();
+    const timerRef = useRef<NodeJS.Timeout | null>( null );
 
     const handleRefresh = useCallback( async () =>
     {
         try
         {
-            const refreshResult = await dispatch(authApi.endpoints.refreshToken.initiate()).unwrap() as { data: RefreshTokenResponse };
+            console.log( "Attempting to refresh token..." );
+            
+            const refreshResult = await dispatch(
+                authApi.endpoints.refreshToken.initiate()
+            ).unwrap();
 
-            console.log( "handle refresh token", refreshResult )
+            console.log( "Refresh token result:", refreshResult );
 
-            if ( refreshResult?.data )
+            if ( refreshResult?.success && refreshResult?.data )
             {
                 dispatch(
                     getCredentials( {
@@ -28,50 +30,74 @@ export const useAutoRefresh = () =>
                         accessTokenExpiresAt: refreshResult.data.accessTokenExpiresAt,
                     } )
                 );
-            }
-            else
+                console.log( "Token refreshed successfully" );
+            } else
             {
+                console.log( "Refresh failed, logging out" );
                 dispatch( logout() );
             }
-        }
-        catch
+        } catch ( error )
         {
+            console.error( "Token refresh failed:", error );
             dispatch( logout() );
         }
     }, [ dispatch ] );
 
     useEffect( () =>
     {
-        if ( !accessTokenExpiresAt || !user ) return;
+        if ( timerRef.current )
+        {
+            clearTimeout( timerRef.current );
+            timerRef.current = null;
+        }
 
-        console.log( "Refreshing the token!!" )
+        if ( !accessTokenExpiresAt || !user )
+        {
+            console.log( "No token expiry or user, skipping refresh setup" );
+            return;
+        }
+
+        console.log( "Setting up token refresh..." );
 
         const expiresDate = new Date( accessTokenExpiresAt ).getTime();
         const now = Date.now();
         const timeUntilExpire = expiresDate - now;
-        console.log("accessTokenExpiresAt", accessTokenExpiresAt);
-        console.log( "expiresDate", new Date( accessTokenExpiresAt ).getTime() );
-        console.log( "now", Date.now() );
-        console.log( "timeUntilExpire", expiresDate - Date.now() );
+        
+        console.log( "Token expires at:", new Date( accessTokenExpiresAt ) );
+        console.log( "Current time:", new Date( now ) );
+        console.log( "Time until expire (ms):", timeUntilExpire );
+        console.log( "Time until expire (minutes):", Math.round( timeUntilExpire / 60000 ) );
 
-        // Refresh 1 minute before expiry
-        const refreshTime = timeUntilExpire - 60 * 1000;
-        console.log( refreshTime, expiresDate )
+        const refreshTime = timeUntilExpire - 30 * 1000;
+        
+        console.log( "Refresh time (ms):", refreshTime );
+        console.log( "Refresh time (minutes):", Math.round( refreshTime / 60000 ) );
 
         if ( refreshTime <= 0 )
         {
-            // Token expired or close to expiry, refresh immediately
+            console.log( "Token expired or close to expiry, refreshing immediately" );
             handleRefresh();
             return;
         }
-        
-        const timer = setTimeout( () =>
+
+        timerRef.current = setTimeout( () =>
         {
+            console.log( "Timer triggered, refreshing token..." );
             handleRefresh();
         }, refreshTime );
 
-        console.log( "token refreshed" )
+        console.log( "Token refresh timer set for", Math.round( refreshTime / 60000 ), "minutes" );
 
-        return () => clearTimeout( timer );
+        // Cleanup function
+        return () =>
+        {
+            if ( timerRef.current )
+            {
+                clearTimeout( timerRef.current );
+                timerRef.current = null;
+            }
+        };
     }, [ accessTokenExpiresAt, user, handleRefresh ] );
+
+    return { handleRefresh };
 };

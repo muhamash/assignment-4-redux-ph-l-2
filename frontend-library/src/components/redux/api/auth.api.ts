@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { LoginResponse, RefreshTokenResponse } from "../../types/auth.type";
 import type { LoginValues, RegisterValues } from "../../types/form.type";
+import type { RootState } from "../store/store";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,6 +12,16 @@ export const authApi = createApi( {
     baseQuery: fetchBaseQuery( {
         baseUrl: BASE_URL,
         credentials: "include",
+        prepareHeaders: ( headers, { getState } ) =>
+        {
+            const token = ( getState() as RootState ).auth.accessToken;
+            console.log(token)
+            if ( token )
+            {
+                headers.set( "authorization", `Bearer ${ token }` );
+            }
+            return headers;
+        },
     } ),
     endpoints: ( builder ) => ( {
         login: builder.mutation<LoginResponse, LoginValues>( {
