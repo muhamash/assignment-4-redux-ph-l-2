@@ -3,8 +3,9 @@ import Cookies from "js-cookie";
 import type { AuthState, User } from "../../../types/auth.type";
 
 const initialState: AuthState = {
-  user: null,
-  accessToken: null,
+    user: null,
+    accessToken: null,
+    accessTokenExpiresAt: null
 };
 
 const authSlice = createSlice( {
@@ -13,11 +14,12 @@ const authSlice = createSlice( {
     reducers: {
         getCredentials: (
             state,
-            action: PayloadAction<{ user: User; accessToken: string }>
+            action: PayloadAction<{ user: User; accessToken: string, accessTokenExpiresAt?: string | Date | null }>
         ) =>
         {
             state.user = action.payload.user;
             state.accessToken = action.payload.accessToken;
+            state.accessTokenExpiresAt = action.payload.accessTokenExpiresAt;
 
             // Cookies.set( "accessToken", action.payload.accessToken, { expires: 7 } );
         },

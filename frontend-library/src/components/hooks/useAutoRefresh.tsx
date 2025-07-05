@@ -5,15 +5,16 @@ import { useAppDispatch, useAppSelector } from "./useRedux";
 
 export const useAutoRefresh = () =>
 {
-    const expiresAt = useAppSelector( ( state ) => state.auth.expiresAt );
+    const accessTokenExpiresAt = useAppSelector( ( state ) => state.auth.accessTokenExpiresAt );
     const dispatch = useAppDispatch();
 
     const handleRefresh = useCallback( async () =>
     {
         try
         {
-            // Using the refreshToken mutation here
             const refreshResult = await dispatch( authApi.endpoints.refreshToken.initiate() ).unwrap();
+
+            console.log(refreshResult)
 
             if ( refreshResult?.data )
             {
@@ -21,7 +22,7 @@ export const useAutoRefresh = () =>
                     getCredentials( {
                         user: refreshResult.data.user,
                         accessToken: refreshResult.data.accessToken,
-                        // expiresAt: refreshResult.data.expiresAt,
+                        accessTokenExpiresAt: refreshResult.data.accessTokenExpiresAt,
                     } )
                 );
             }
@@ -38,14 +39,17 @@ export const useAutoRefresh = () =>
 
     useEffect( () =>
     {
-        if ( !expiresAt ) return;
+        if ( !accessTokenExpiresAt ) return;
 
-        const expiresDate = new Date( expiresAt ).getTime();
+        console.log("Refreshing the token!!")
+
+        const expiresDate = new Date( accessTokenExpiresAt ).getTime();
         const now = Date.now();
         const timeUntilExpire = expiresDate - now;
 
         // Refresh 1 minute before expiry
         const refreshTime = timeUntilExpire - 60 * 1000;
+        console.log(refreshTime, expiresDate)
 
         if ( refreshTime <= 0 )
         {
@@ -53,12 +57,14 @@ export const useAutoRefresh = () =>
             handleRefresh();
             return;
         }
-
+        
         const timer = setTimeout( () =>
         {
             handleRefresh();
         }, refreshTime );
 
+        console.log( "token refreshed" )
+
         return () => clearTimeout( timer );
-    }, [ expiresAt, handleRefresh ] );
+    }, [ accessTokenExpiresAt, handleRefresh ] );
 };

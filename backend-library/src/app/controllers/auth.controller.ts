@@ -84,6 +84,8 @@ export const login = async ( req: Request, res: Response, next: NextFunction ): 
         const accessToken = generateAccessToken( user.id );
         const refreshToken = generateRefreshToken( user.id );
         const expiresAt = new Date( Date.now() + 7 * 24 * 60 * 60 * 1000 );
+        const accessTokenExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
+
 
         await Session.create( {
             user: user.id,
@@ -105,8 +107,8 @@ export const login = async ( req: Request, res: Response, next: NextFunction ): 
                 email: user.email,
                 name: user.name,
                 accessToken,
-                expiresAt,
-                expire: "15 mints only"
+                accessTokenExpiresAt,
+                expire: "2 mints only"
             },
         } );
     }
@@ -165,16 +167,17 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
         }
   
         const payload = jwt.verify( refreshToken, process.env.REFRESH_TOKEN_SECRET! ) as any;
+        const user = await User.findById(payload.id).select("-password");
   
         const newAccessToken = generateAccessToken( payload.id );
         const newRefreshToken = generateRefreshToken( payload.id );
         const expiresAt = new Date( Date.now() + 7 * 24 * 60 * 60 * 1000 );
+        const accessTokenExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
   
-        await Session.create( {
-            user: payload.id,
-            refreshToken: newRefreshToken,
-            expiresAt,
-        } );
+        await Session.findOneAndUpdate(
+            { refreshToken },
+            { refreshToken: newRefreshToken, expiresAt }
+        );          
   
         res.cookie( "refreshToken", newRefreshToken, {
             httpOnly: true,
@@ -185,9 +188,10 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
             success: true,
             message: "Access token successfully retrieved",
             data: {
+                user,
                 accessToken: newAccessToken,
-                expiresAt,
-                expire: "15 minutes only",
+                accessTokenExpiresAt,
+                expire: "2 minutes only",
             },
         } );
   

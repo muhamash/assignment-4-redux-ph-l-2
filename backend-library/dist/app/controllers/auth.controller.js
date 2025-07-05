@@ -72,6 +72,7 @@ const login = async (req, res, next) => {
         const accessToken = (0, jwt_util_1.generateAccessToken)(user.id);
         const refreshToken = (0, jwt_util_1.generateRefreshToken)(user.id);
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const accessTokenExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
         await session_model_1.Session.create({
             user: user.id,
             refreshToken,
@@ -90,8 +91,8 @@ const login = async (req, res, next) => {
                 email: user.email,
                 name: user.name,
                 accessToken,
-                expiresAt,
-                expire: "15 mints only"
+                accessTokenExpiresAt,
+                expire: "2 mints only"
             },
         });
     }
@@ -137,14 +138,12 @@ const refreshToken = async (req, res, next) => {
             return;
         }
         const payload = jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const user = await user_model_1.User.findById(payload.id).select("-password");
         const newAccessToken = (0, jwt_util_1.generateAccessToken)(payload.id);
         const newRefreshToken = (0, jwt_util_1.generateRefreshToken)(payload.id);
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        await session_model_1.Session.create({
-            user: payload.id,
-            refreshToken: newRefreshToken,
-            expiresAt,
-        });
+        const accessTokenExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
+        await session_model_1.Session.findOneAndUpdate({ refreshToken }, { refreshToken: newRefreshToken, expiresAt });
         res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true,
             secure: true,
@@ -154,9 +153,10 @@ const refreshToken = async (req, res, next) => {
             success: true,
             message: "Access token successfully retrieved",
             data: {
+                user,
                 accessToken: newAccessToken,
-                expiresAt,
-                expire: "15 minutes only",
+                accessTokenExpiresAt,
+                expire: "2 minutes only",
             },
         });
     }

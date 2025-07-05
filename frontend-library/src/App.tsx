@@ -10,9 +10,6 @@ export default function App ()
 {
     useAutoRefresh();
 
-    // const { data, isLoading, isError } = useGetBooksQuery();
-    // console.log( data, isLoading, isError );
-
     return (
         <div className="min-h-screen bg-background">
             <Nav />

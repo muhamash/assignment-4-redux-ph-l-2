@@ -35,7 +35,7 @@ export default function BookDetail() {
 
     const book = data.data;
     
-    console.log(book)
+    console.log(user)
 
     return (
         <>

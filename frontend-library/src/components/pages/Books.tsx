@@ -23,7 +23,7 @@ export default function Books() {
 
   const userId = tab === "my" ? user?.id : undefined;
 
-  const { data, isLoading, isError } = useGetBooksQuery( {
+  const { data, isLoading, error:isError } = useGetBooksQuery( {
     page: String( page ),
     limit: String( limit ),
     userId,
@@ -34,7 +34,7 @@ export default function Books() {
   // console.log(user)
 
   const books = data?.data;
-  console.log(data)
+  console.log(data, isError)
   const meta = data?.meta;
   const totalPages = meta?.totalPages || 1;
 
@@ -64,7 +64,7 @@ export default function Books() {
       )}
 
       {isLoading && <p className="text-primary-foreground">Loading books...</p>}
-      {isError && <p className="text-red-300">Failed to load books. Please try again.</p>}
+      {isError && <p className="text-red-300">{isError?.data?.message}</p>}
 
       {!isLoading && !isError && books?.length === 0 && (
         <div className="text-white">No books found!</div>

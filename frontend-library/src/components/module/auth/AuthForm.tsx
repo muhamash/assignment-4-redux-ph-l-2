@@ -51,19 +51,29 @@ export default function AuthForm({ mode }: AuthFormInterface) {
       else
       {
         const res = await login( values as LoginValues ).unwrap();
+
+        const user: User = {
+          id: res?.data?.id,
+          email: res?.data?.email,
+          name: res?.data?.name,
+        }
         
-        dispatch( getCredentials( { user: res?.data as User, accessToken: res?.data?.accessToken as string } ) );
+        dispatch( getCredentials( { user, accessToken: res?.data?.accessToken as string, accessTokenExpiresAt: res.data.accessTokenExpiresAt as string | Date } ) );
+
+        console.log( res )
 
         navigate( "/" );
       }
     }
-    catch (error: unknown)
+    catch ( error: unknown )
     {
       toast.error( "Operation failed!" );
-      if (error instanceof Error) {
-        console.error("Error:", error.message);
-      } else {
-        console.error("Error:", error);
+      if ( error instanceof Error )
+      {
+        console.error( "Error:", error.message );
+      } else
+      {
+        console.error( "Error:", error );
       }
     }
   };
