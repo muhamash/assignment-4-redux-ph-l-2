@@ -23,12 +23,13 @@ const authSlice = createSlice( {
 
             // Cookies.set( "accessToken", action.payload.accessToken, { expires: 7 } );
         },
-        logout: ( state ) =>
-        {
+        logout: (state) => {
             state.user = null;
             state.accessToken = null;
-            Cookies.remove( "accessToken" );
-        },
+            state.accessTokenExpiresAt = undefined;
+            
+            Cookies.remove("accessToken");
+        },        
     },
 } );
 

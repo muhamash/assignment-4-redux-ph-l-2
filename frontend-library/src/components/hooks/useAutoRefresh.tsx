@@ -5,7 +5,9 @@ import { useAppDispatch, useAppSelector } from "./useRedux";
 
 export const useAutoRefresh = () =>
 {
-    const accessTokenExpiresAt = useAppSelector( ( state ) => state.auth.accessTokenExpiresAt );
+    const { accessTokenExpiresAt, user } = useAppSelector( ( state ) => state.auth );
+    console.log( accessTokenExpiresAt, user );
+    
     const dispatch = useAppDispatch();
 
     const handleRefresh = useCallback( async () =>
@@ -39,7 +41,7 @@ export const useAutoRefresh = () =>
 
     useEffect( () =>
     {
-        if ( !accessTokenExpiresAt ) return;
+        if ( !accessTokenExpiresAt || !user) return;
 
         console.log("Refreshing the token!!")
 

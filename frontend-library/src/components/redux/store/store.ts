@@ -10,7 +10,7 @@ import paginationReducer from "../features/books/paginationSlice";
 const persistConfig = {
     key: 'auth',
     storage,
-    whitelist: [ 'user', 'accessToken' ],
+    whitelist: [ 'user', 'accessToken', 'accessTokenExpiresAt' ],
 };
 
 const persistedAuthReducer = persistReducer(persistConfig, authReducer);
