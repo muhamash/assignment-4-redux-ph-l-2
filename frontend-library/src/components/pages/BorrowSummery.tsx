@@ -45,13 +45,15 @@ export default function BorrowSummary() {
     <div className="p-6">
       <h1 className="text-2xl font-bold my-10 text-center">Borrow Summary</h1>
 
+      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {data?.data?.map((item, index) => (
           <Card key={index} className="shadow-md hover:shadow-lg transition-shadow bg-sky-50">
             <CardContent className="p-4">
               <h2 className="text-lg font-semibold mb-2">{item.book.title}</h2>
               <p className="text-sm text-gray-500 mb-2">ISBN: {item.book.isbn}</p>
-              <p className="font-medium mb-2">Total Borrowed: {item.totalQuantity}</p>
+              <p className="font-medium mb-2">Total Borrowed: <Badge variant={"default"}>{item.totalQuantity}</Badge></p>
 
               <div className="border-t pt-2 mt-2">
                 <p className="font-semibold text-sm mb-1">Borrowers:</p>

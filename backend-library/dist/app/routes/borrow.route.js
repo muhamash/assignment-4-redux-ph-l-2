@@ -10,4 +10,4 @@ const preventOwnBorrow_middleware_1 = require("../middlewares/preventOwnBorrow.m
 const verifyUser_middleware_1 = require("../middlewares/verifyUser.middleware");
 exports.borrowRouter = express_1.default.Router();
 exports.borrowRouter.post("/", verifyUser_middleware_1.verifyAccessToken, preventOwnBorrow_middleware_1.preventOwnBorrow, borrow_controller_1.borrowABook);
-exports.borrowRouter.get("/", verifyUser_middleware_1.verifyAccessToken, borrow_controller_1.BorrowBooksSummary);
+exports.borrowRouter.get("/summary", verifyUser_middleware_1.verifyAccessToken, borrow_controller_1.BorrowBooksSummary);
