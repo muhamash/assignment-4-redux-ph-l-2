@@ -97,7 +97,7 @@ This is the **frontend client** for the Library Management System, providing a s
 
 | **Layer** | **Technology** | **Purpose** |
 |-----------|----------------|-------------|
-| **Frontend Framework** | React 18 | Component-based UI library |
+| **Frontend Framework** | React 19 | Component-based UI library |
 | **Language** | TypeScript | Static typing and enhanced developer experience |
 | **State Management** | Redux Toolkit + RTK Query | Data fetching, caching, and state management |
 | **Styling** | Tailwind CSS | Utility-first CSS framework |
@@ -192,12 +192,6 @@ npm run build
 # Preview production build
 npm run preview
 
-# Run tests
-npm run test
-
-# Type checking
-npm run type-check
-
 # Linting
 npm run lint
 ```
@@ -273,29 +267,6 @@ export const booksApi = createApi({
 
 ---
 
-## 🔧 Development Scripts
-
-```bash
-# Development
-npm run dev          # Start development server
-npm run dev:host     # Start dev server with network access
-
-# Building
-npm run build        # Build for production
-npm run preview      # Preview production build
-
-# Testing & Quality
-npm run test         # Run unit tests
-npm run test:watch   # Run tests in watch mode
-npm run e2e          # Run e2e tests
-npm run lint         # Run ESLint
-npm run lint:fix     # Fix linting issues
-npm run type-check   # TypeScript type checking
-
-# Maintenance
-npm run clean        # Clean build files
-npm run analyze      # Analyze bundle size
-```
 
 ---
 
@@ -376,7 +347,7 @@ export const BookCard: React.FC<BookCardProps> = ({
 
 ## 🛜 Links
 
-- **Frontend Repository:** https://github.com/muhamash/library-frontend
-- **Backend Repository:** https://github.com/muhamash/library-api-express-ts-monggose
-- **Live Demo:** [Coming Soon]
+- **Frontend Repository:** https://github.com/muhamash/assignment-4-redux-ph-l-2/blob/main/frontend-library
+- **Backend Repository:** https://github.com/muhamash/assignment-4-redux-ph-l-2/blob/main/backend-library
+- **Live Demo:** [https://assignment-4-redux-ph-l-2-ideh.vercel.app](https://assignment-4-redux-ph-l-2-ideh.vercel.app)
 - **Author:** https://github.com/muhamash
