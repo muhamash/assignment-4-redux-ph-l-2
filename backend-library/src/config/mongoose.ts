@@ -8,11 +8,17 @@ async function mongooseConnect(): Promise<void> {
       throw new Error("❌ MONGO_DB_URI is not defined in environment variables");
     }
 
-    await mongoose.connect(uri);
+    await mongoose.connect( uri, {
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+    } );
+
     console.log("🥭 Connected to MongoDB Using Mongoose!");
-  } catch (error) {
+  }
+  catch ( error )
+  {
     console.error("❌ MongoDB Connection Error:", error);
   }
-}
+};
 
 export default mongooseConnect;

@@ -10,11 +10,15 @@ async function mongooseConnect() {
         if (!uri) {
             throw new Error("❌ MONGO_DB_URI is not defined in environment variables");
         }
-        await mongoose_1.default.connect(uri);
+        await mongoose_1.default.connect(uri, {
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 45000,
+        });
         console.log("🥭 Connected to MongoDB Using Mongoose!");
     }
     catch (error) {
         console.error("❌ MongoDB Connection Error:", error);
     }
 }
+;
 exports.default = mongooseConnect;
