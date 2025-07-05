@@ -16,6 +16,7 @@ import
     PaginationPrevious,
   } from "../ui/pagination";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
+import { isFetchBaseQueryError } from "../guard/TypeGuards";
 
 export default function Books() {
   const user = useAppSelector((state: RootState) => state.auth.user);
@@ -55,15 +56,10 @@ export default function Books() {
     }
   };
 
-  if ( isError )
-  {
-    const errorMessage =
-      isError && "status" in isError && isError.data
-    ? JSON.stringify(isError.data)
-    : "Unexpected error";
+  const apiError = isError && isFetchBaseQueryError( isError ) && isError.data && typeof isError.data === "object"
+    ? ( isError.data as { message?: string } ).message
+    : null;
 
-    return (<p className="text-red-300">{errorMessage}</p>)
-  }
 
   return (
     <div className="bg-gray-100 py-20 flex flex-col items-center justify-center gap-10">
@@ -82,6 +78,10 @@ export default function Books() {
         <Loader2 className="animate-spin w-10 h-10 text-gray-500" />
         <span className="ml-3 text-lg text-black">Loading books...</span>
       </div>}
+
+      {
+        apiError && ( <p className="text-red-600">{ apiError }</p>)
+      }
       
 
       {!isLoading && !isError && books?.length === 0 && (
