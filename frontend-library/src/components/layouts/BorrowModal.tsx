@@ -84,10 +84,9 @@ export default function BorrowModal ()
 
     if ( !book ) return null;
 
-    const apiError =
-                isFetchBaseQueryError( error ) && error.data && typeof error.data === "object"
-                    ? ( error.data as { message?: string } ).message
-                    : "unknown error!!";
+    const apiError = error && isFetchBaseQueryError(error) && error.data && typeof error.data === "object"
+        ? (error.data as { message?: string }).message
+        : null;
 
 
     console.log( apiError, error, data, "borrow modal" );
@@ -175,7 +174,9 @@ export default function BorrowModal ()
                             <Button type="submit">{ isLoading ? "working.." : "Confirm" }</Button>
                         </DialogFooter>
                         {apiError && (
-                            <p className="text-red-500 text-center text-sm">{apiError}</p>
+                            <div className="text-red-500 text-center text-sm bg-red-50 p-2 rounded">
+                                {apiError}
+                            </div>
                         )}
                     </form>
                 </Form>

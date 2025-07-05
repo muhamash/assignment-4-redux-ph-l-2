@@ -284,45 +284,6 @@ export const booksApi = createApi({
 - **Source Maps:** Proper error stack traces
 
 ---
-```tsx
-
-export const BookCard: React.FC<BookCardProps> = ({
-  book,
-  onEdit,
-  onDelete,
-  onBorrow,
-}) => {
-  return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      <CardHeader>
-        <CardTitle className="line-clamp-2">{book.title}</CardTitle>
-        <CardDescription>by {book.author}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <Badge variant="secondary">{book.genre}</Badge>
-          <p className="text-sm text-muted-foreground">
-            Available: {book.copies} copies
-          </p>
-        </div>
-      </CardContent>
-      <CardFooter className="flex gap-2">
-        <Button size="sm" onClick={() => onEdit(book)}>
-          Edit
-        </Button>
-        <Button size="sm" variant="destructive" onClick={() => onDelete(book._id)}>
-          Delete
-        </Button>
-        <Button size="sm" variant="outline" onClick={() => onBorrow(book)}>
-          Borrow
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-};
-```
-
----
 
 ## 🚀 Performance Optimizations
 
@@ -331,16 +292,6 @@ export const BookCard: React.FC<BookCardProps> = ({
 - **Image Optimization:** Responsive images with lazy loading
 - **Caching:** RTK Query automatic caching and background updates
 - **Memoization:** Strategic use of React.memo and useMemo
-
----
-
-## 🌐 Browser Support
-
-- **Chrome:** Latest 2 versions
-- **Firefox:** Latest 2 versions
-- **Safari:** Latest 2 versions
-- **Edge:** Latest 2 versions
-- **Mobile:** iOS Safari, Chrome Mobile
 
 ---
 ---
