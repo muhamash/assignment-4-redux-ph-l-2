@@ -14,19 +14,28 @@ This is the **frontend client** for the Library Management System, providing a s
 
 ### **📚 Core Functionality**
 
-- **Complete Book Management:** View, add, edit, and delete books with real-time updates
-- **Interactive Borrowing System:** Borrow books with availability validation and business logic
-- **Aggregated Summaries:** View borrowed books with total quantity tracking
-- **Responsive Design:** Fully responsive layout for mobile, tablet, and desktop
-- **Professional UI:** Modern components using shadcn/ui and Tailwind CSS
+- **Complete Book Management:** View, add, edit, delete, and borrow books with real-time updates.
+- **Authentication & Authorization:** JWT-based authentication with session persistence and secure access control.
+- **Interactive Borrowing System:** Borrow books with availability validation and business logic.
+- **Aggregated Summaries:** View borrowed books with total quantity tracking.
+- **Responsive Design:** Fully responsive layout for mobile, tablet, and desktop.
+- **Professional UI:** Modern components using shadcn/ui and Tailwind CSS.
 
 ### **🎯 Key Highlights**
 
-- **No Authentication Required:** All features accessible without login
+- **Authentication Required:** Only book list and view books are for features accessible without login, To access full control please login
 - **Real-time Updates:** Optimistic UI updates for smooth user experience
 - **Type-Safe:** Full TypeScript implementation with proper typing
 - **Modern Stack:** Latest React patterns with RTK Query for state management
 - **Beautiful UX:** Toast notifications, smooth animations, and elegant interactions
+
+## 🔐 Session Management & Private Routes
+
+- JWT-based authentication with secure storage (access token).
+- Session persistence across page refreshes using local storage.
+- Private routes implemented via a `<PrivateRoute />` wrapper component.
+- Automatic token injection into all API requests using RTK Query.
+- Optional auto-refresh support (can be extended).
 
 ---
 
@@ -76,10 +85,21 @@ This is the **frontend client** for the Library Management System, providing a s
 ### **🔧 Advanced Features**
 - **Loading States:** Skeleton loaders and spinners
 - **Error Boundaries:** Graceful error handling
-- **Animations:** Smooth transitions and micro-interactions
 - **Responsive Design:** Mobile-first approach with breakpoints
 
 ---
+
+### Example Protected Route
+
+```tsx
+<Route
+  path="/create-book"
+  element={
+    <PrivateRoute>
+      <CreateBookPage />
+    </PrivateRoute>
+  }
+/>
 
 ## 📱 Page Structure
 
@@ -144,12 +164,6 @@ This is the **frontend client** for the Library Management System, providing a s
 - **Desktop Experience:** Full-featured desktop interface
 - **Touch-Friendly:** Appropriate touch targets and interactions
 
-### **♿ Accessibility**
-- **Keyboard Navigation:** Full keyboard accessibility
-- **Screen Reader Support:** Proper ARIA labels and descriptions
-- **Color Contrast:** WCAG compliant color combinations
-- **Focus Management:** Clear focus indicators
-
 ---
 
 ## 🚀 Getting Started
@@ -179,8 +193,8 @@ npm run dev
 ### **🔧 Environment Variables**
 
 ```env
-# .env.local
-VITE_API_BASE_URL=http://localhost:3000/api
+# .env
+VITE_API_BASE_URL= {API_URL}
 ```
 
 ### **🏗️ Build & Deployment**
@@ -210,6 +224,14 @@ export const booksApi = createApi({
   reducerPath: 'booksApi',
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.VITE_API_BASE_URL,
+    credential : true,
+    prepareHeaders: (headers, { getState }) => {
+    const token = {}
+    if (token) {
+      headers.set("authorization", `Bearer ${token}`);
+    }
+    return headers;
+    }
   }),
   tagTypes: ['Book', 'Borrow'],
   endpoints: (builder) => ({
@@ -223,36 +245,31 @@ export const booksApi = createApi({
     // ... other endpoints
   }),
 })
+
+export const authApi = createApi({
+  reducerPath: 'authApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.VITE_API_BASE_URL,
+    credential : true,
+    prepareHeaders: (headers, { getState }) => {
+    const token = {}
+    if (token) {
+      headers.set("authorization", `Bearer ${token}`);
+    }
+    return headers;
+    }
+  }),
+  endpoints: (builder) => ({
+    getBooks: builder.mutation<LoginResponse, LoginValues>({
+      query: (params) => ({
+        url: '/auth/login',
+        params,
+      }),
+    }),
+    // ... other endpoints
+  }),
+})
 ```
-
-### **💡 Example API Interactions**
-
-#### **Borrow Book Request**
-```json
-{
-  "book": "64f12a4abc4567890def0001",
-  "quantity": 1,
-  "dueDate": "2025-07-20T00:00:00.000Z"
-}
-```
-
-#### **Borrow Book Response**
-```json
-{
-  "success": true,
-  "message": "Book borrowed successfully",
-  "data": {
-    "_id": "64f123abc4567890def12345",
-    "book": "64f12a4abc4567890def0001",
-    "quantity": 1,
-    "dueDate": "2025-07-20T00:00:00.000Z",
-    "createdAt": "2025-07-04T23:34:52.831Z",
-    "updatedAt": "2025-07-04T23:34:52.831Z"
-  }
-}
-```
-
----
 
 ## 🎯 Bonus Features Implemented
 

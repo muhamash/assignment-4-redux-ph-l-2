@@ -39,7 +39,6 @@ library-management/
 │   │   ├── utils/           # Helper functions
 │   │   └── types/           # TypeScript definitions
 │   └── package.json
-├── docs/                    # Additional documentation
 └── README.md               # This file
 ```
 
@@ -48,7 +47,7 @@ library-management/
 ## 🛠️ Tech Stack
 
 ### 🖥️ Frontend
-- **Framework**: React 18 + Vite
+- **Framework**: React 19 + Vite
 - **Language**: TypeScript
 - **State Management**: Redux Toolkit Query (RTK Query)
 - **Form Handling**: React Hook Form + Zod validation
@@ -76,7 +75,7 @@ library-management/
 - **View Books**: Browse all books with detailed information and status indicators
 - **Update Books**: Edit book information with real-time validation
 - **Delete Books**: Remove books with confirmation dialogs
-- **Search & Filter**: Find books by title, author, or availability status
+
 
 ### 📊 Library Analytics
 - **Borrow Summary**: View aggregated statistics of borrowed books
@@ -114,7 +113,7 @@ library-management/
    npm install
    
    # Create environment file
-   cp .env.example .env
+   cp  .env
    # Edit .env with your MongoDB URI and other configs
    
    # Start development server
@@ -127,8 +126,8 @@ library-management/
    npm install
    
    # Create environment file
-   cp .env.example .env
-   # Edit .env with your backend API URL
+   cp  .env
+
    
    # Start development server
    npm run dev
@@ -137,34 +136,21 @@ library-management/
 4. **Access the Application**
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:3000
-   - API Docs: http://localhost:3000/docs
-
 ---
 
 ## 📚 API Documentation
 
 ### Base URL
 ```
-https://library-mgmt-api.herokuapp.com/api/v1
+https://assignment-4-redux-ph-l-2.vercel.app/api
 ```
 
-### Key Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/books` | Get all books |
-| `POST` | `/books` | Create a new book |
-| `GET` | `/books/:id` | Get book by ID |
-| `PUT` | `/books/:id` | Update book |
-| `DELETE` | `/books/:id` | Delete book |
-| `GET` | `/books/summary` | Get borrowing summary |
-| `PATCH` | `/books/:id/borrow` | Borrow/return book |
 
 ### Sample Request/Response
 
 **Create Book**
 ```bash
-POST /api/v1/books
+POST /api/books
 Content-Type: application/json
 
 {
@@ -262,25 +248,10 @@ REFRESH_TOKEN_SECRET = "REFRESH_TOKEN_SECRET"
 - GitHub: [@muhamash](https://github.com/muhamash)
 - Email: muhammad-ashraful@outlook.com
 
----
-
-## 🙏 Acknowledgments
-
-- Thanks to the open-source community for the amazing tools and libraries
-- Inspired by modern library management systems
-- Built with ❤️ for the developer community
-
----
-
 ## 🔮 Future Enhancements
 
-- [ ] User authentication and role-based access
-- [ ] Book reservation system
-- [ ] Advanced search with filters
-- [ ] Email notifications for overdue books
-- [ ] Multi-language support
-- [ ] Mobile app development
-- [ ] Analytics dashboard
-- [ ] Book recommendations engine
+- [ ] User authentication and Authorization access with JWT
+- [ ] Book borrowing system
+- [ ] Show user his own books
 
 ---
