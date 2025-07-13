@@ -18,17 +18,17 @@ sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 sessionSchema.post("save", function (doc) {
     console.log(`New session created for user ${doc.user} at ${doc.createdAt}`);
 });
-sessionSchema.pre("save", async function (next) {
-    if (this.isModified("refreshToken")) {
-        console.log("Rotating refresh token for session", this._id);
-    }
-    // Prevent duplicate active sessions (single device policy)
-    const existing = await this.constructor.findOne({ user: this.user });
-    if (existing) {
-        await existing.deleteOne();
-    }
-    next();
-});
+// sessionSchema.pre("save", async function (next) {
+//   if (this.isModified("refreshToken")) {
+//     console.log("Rotating refresh token for session", this._id);
+//   }
+//   // Prevent duplicate active sessions (single device policy)
+//   const existing = await ( this.constructor as typeof Session ).findOne( { user: this.user } );
+//   if (existing) {
+//     await existing.deleteOne();
+//   }
+//   next();
+// } );
 // sessionSchema.pre( "save", async function ( next )
 // {
 //     const sessions = await this.constructor.find( { user: this.user } );

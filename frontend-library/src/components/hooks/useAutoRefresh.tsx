@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef } from "react";
 import { authApi } from "../redux/api/auth.api";
 import { getCredentials, logout } from "../redux/features/auth/authSlice";
+import type { RootState } from "../redux/store/store";
 import { useAppDispatch, useAppSelector } from "./useRedux";
 
 export const useAutoRefresh = () =>
 {
-    const { accessTokenExpiresAt, user } = useAppSelector( ( state ) => state.auth );
+    const { accessTokenExpiresAt, user } = useAppSelector( ( state : RootState ) => state.auth );
     const dispatch = useAppDispatch();
     const timerRef = useRef<NodeJS.Timeout | null>( null );
 
@@ -68,7 +69,7 @@ export const useAutoRefresh = () =>
         console.log( "Time until expire (ms):", timeUntilExpire );
         console.log( "Time until expire (minutes):", Math.round( timeUntilExpire / 60000 ) );
 
-        const refreshTime = timeUntilExpire - 60 * 1000;
+        const refreshTime = timeUntilExpire - 30 * 1000;
         
         console.log( "Refresh time (ms):", refreshTime );
         console.log( "Refresh time (minutes):", Math.round( refreshTime / 60000 ) );

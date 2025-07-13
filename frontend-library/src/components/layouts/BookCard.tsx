@@ -19,6 +19,13 @@ export default function BookCard ( { book }: { book: IBook } )
     const user = useAppSelector( ( state: RootState ) => state?.auth?.user );
     const [ deleteBook ] = useDeleteBookMutation();
 
+    const handleBorrow = () =>
+    {
+        dispatch( openBorrowModal( { ...book, quantity: 1, dueDate: new Date().toISOString() } ) );
+        
+        navigate("/borrow-summary")
+    }
+
     // console.log(user.id)
 
     const handleDelete = ( bookId: string ) =>
@@ -124,7 +131,7 @@ export default function BookCard ( { book }: { book: IBook } )
                             variant="outline"
                             size="sm"
                             onClick={
-                                () => dispatch( openBorrowModal( { ...book, quantity: 1, dueDate: new Date().toISOString() } ) )
+                                handleBorrow
                             }
                         >
                             Borrow
