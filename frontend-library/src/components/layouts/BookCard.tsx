@@ -16,16 +16,42 @@ export default function BookCard ( { book }: { book: IBook } )
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
+
+    // const modalState = useAppSelector( ( state : RootState ) => state?.modal?.borrowModal );
+    // console.log(modalState.isOpen, typeof modalState)
     const user = useAppSelector( ( state: RootState ) => state?.auth?.user );
     const [ deleteBook ] = useDeleteBookMutation();
 
-    const handleBorrow = () =>
-    {
-        dispatch( openBorrowModal( { ...book, quantity: 1, dueDate: new Date().toISOString() } ) );
-        
-        navigate("/borrow-summary")
-    }
+    // useEffect( () =>
+    // {
+    //     if ( modalState?.isOpen )
+    //     {
+    //         console.log({modalState}, typeof modalState)
+    //         navigate( "/borrow-summary" );
+    //     }
+    // }, [modalState] );
 
+    // const handleBorrow = async () =>
+    // {
+    //     try
+    //     {
+    //         dispatch( openBorrowModal( { ...book, quantity: 1, dueDate: new Date().toISOString() } ) );
+
+    //         // navigate( "/borrow-summary" );
+    //     } catch ( error:unknown )
+    //     {
+    //         toast.error( error?.message || "Something went wrong" );
+    //     }
+    // };    
+
+    // const confirmButton = () =>
+    // {
+    //     const result = await handleBorrow();
+
+    //     if (openBorrowModal.fulfilled.match(result)) {
+    //         navigate("/borrow-summary");
+    //       }
+    // }
     // console.log(user.id)
 
     const handleDelete = ( bookId: string ) =>
@@ -130,9 +156,7 @@ export default function BookCard ( { book }: { book: IBook } )
                             disabled={!book?.available || user?.id === book.createdBy?.id || !user?.id}
                             variant="outline"
                             size="sm"
-                            onClick={
-                                handleBorrow
-                            }
+                            onClick={() => dispatch(openBorrowModal({ ...book, quantity: 1, dueDate: new Date().toISOString() }))}
                         >
                             Borrow
                         </Button>

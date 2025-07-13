@@ -169,7 +169,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
   
         console.log("Looking for session with refresh token:", refreshToken);
         
-        const session = await Session.findOne( { refreshToken } );
+        const session = await Session.findOne( { refreshToken: refreshToken } );
         console.log("Found session:", session);
         
         if ( !session )
@@ -187,7 +187,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
         // Check if session has expired
         if (session.expiresAt && new Date() > session.expiresAt) {
             console.log("Session has expired");
-            await Session.findOneAndDelete({ refreshToken });
+            await Session.findOneAndDelete({ refreshToken: refreshToken });
             res.status( 403 ).json( { 
                 success: false,
                 message: "Session expired", 
@@ -202,7 +202,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
             console.log("JWT payload:", payload);
         } catch (jwtError) {
             console.log("JWT verification failed:", jwtError);
-            await Session.findOneAndDelete({ refreshToken });
+            await Session.findOneAndDelete({ refreshToken: refreshToken });
             res.status( 403 ).json( { 
                 success: false,
                 message: "Invalid refresh token", 
@@ -215,7 +215,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
         
         if (!user) {
             console.log("User not found for ID:", payload.id);
-            await Session.findOneAndDelete({ refreshToken });
+            await Session.findOneAndDelete( { refreshToken: refreshToken } );
             res.status( 403 ).json( { 
                 success: false,
                 message: "User not found", 

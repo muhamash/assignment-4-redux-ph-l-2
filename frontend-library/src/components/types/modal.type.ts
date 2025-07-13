@@ -4,6 +4,7 @@ export interface ModalState {
     [ key: string ]: {
         isOpen: boolean;
         book: IBook | null;
+        isConfirm?: boolean
     };
 };  
 

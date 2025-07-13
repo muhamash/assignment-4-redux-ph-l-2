@@ -11,6 +11,7 @@ const initialState: ModalState = {
   borrowModal: {
     isOpen: false,
     book: null,
+    isConfirm: false,
   }
 };
 
@@ -25,6 +26,7 @@ export const modalSlice = createSlice({
     closeBorrowModal: (state) => {
       state.borrowModal.isOpen = false;
       state.borrowModal.book = null;
+      state.borrowModal.isOpen = true;
     },
     openEditModal: (state, action: PayloadAction<IBook>) => {
       state.editModal.isOpen = true;

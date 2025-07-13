@@ -142,7 +142,7 @@ const refreshToken = async (req, res, next) => {
             refreshToken: req.cookies.refreshToken,
         });
         console.log("Looking for session with refresh token:", refreshToken);
-        const session = await session_model_1.Session.findOne({ refreshToken });
+        const session = await session_model_1.Session.findOne({ refreshToken: refreshToken });
         console.log("Found session:", session);
         if (!session) {
             console.log("No session found for refresh token");
@@ -156,7 +156,7 @@ const refreshToken = async (req, res, next) => {
         // Check if session has expired
         if (session.expiresAt && new Date() > session.expiresAt) {
             console.log("Session has expired");
-            await session_model_1.Session.findOneAndDelete({ refreshToken });
+            await session_model_1.Session.findOneAndDelete({ refreshToken: refreshToken });
             res.status(403).json({
                 success: false,
                 message: "Session expired",
@@ -171,7 +171,7 @@ const refreshToken = async (req, res, next) => {
         }
         catch (jwtError) {
             console.log("JWT verification failed:", jwtError);
-            await session_model_1.Session.findOneAndDelete({ refreshToken });
+            await session_model_1.Session.findOneAndDelete({ refreshToken: refreshToken });
             res.status(403).json({
                 success: false,
                 message: "Invalid refresh token",
@@ -182,7 +182,7 @@ const refreshToken = async (req, res, next) => {
         const user = await user_model_1.User.findById(payload.id).select("-password");
         if (!user) {
             console.log("User not found for ID:", payload.id);
-            await session_model_1.Session.findOneAndDelete({ refreshToken });
+            await session_model_1.Session.findOneAndDelete({ refreshToken: refreshToken });
             res.status(403).json({
                 success: false,
                 message: "User not found",

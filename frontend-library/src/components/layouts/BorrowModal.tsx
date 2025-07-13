@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { cn } from "../../lib/utils";
 import { zodBorrowSchema } from "../../lib/zod";
@@ -23,7 +24,7 @@ export default function BorrowModal ()
     const dispatch = useAppDispatch();
     const user = useAppSelector( ( state: RootState ) => state.auth.user );
     const { isOpen, book } = useAppSelector( ( state: RootState ) => state.modal.borrowModal );
-
+    const navigate = useNavigate();
     const [ borrowBook, {data, isLoading, error } ] = useBorrowBookMutation();
 
     const form = useForm<BorrowModalBook>( {
@@ -61,6 +62,7 @@ export default function BorrowModal ()
           
                 dispatch( closeBorrowModal() );
                 form.reset();
+                navigate("/borrow-summary")
             }
             else
             {
