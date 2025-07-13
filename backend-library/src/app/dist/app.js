@@ -20,19 +20,21 @@ var books_route_1 = require("./routes/books.route");
 var borrow_route_1 = require("./routes/borrow.route");
 var app = express_1["default"]();
 app.use(cookie_parser_1["default"]());
+app.use(express_1["default"].json());
 app.use(cors_1["default"]({
     origin: ["http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app", "https://assignment-4-redux-ph-l-2-ideh.vercel.app"],
     credentials: true
 }));
-app.use(express_1["default"].json({ type: '*/*' }));
-app.use(function (req, res, next) {
-    var type = req.headers['content-type'] || '';
-    if (!type.includes('application/json')) {
-        req.headers['content-type'] = 'application/json';
-    }
-    next();
-});
-app.use(express_1["default"].json());
+// app.use( express.json( { type: '*/*' } ) );
+// app.use( ( req, res, next ) =>
+// {
+//     const type = req.headers[ 'content-type' ] || '';
+//     if ( !type.includes( 'application/json' ) )
+//     {
+//         req.headers[ 'content-type' ] = 'application/json';
+//     }
+//     next();
+// } );;
 app.get("/", home_controller_1.home);
 app.use("/api/books", books_route_1.booksRouter);
 app.use("/api/borrow", borrow_route_1.borrowRouter);
