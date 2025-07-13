@@ -19,10 +19,11 @@ var auth_route_1 = require("./routes/auth.route");
 var books_route_1 = require("./routes/books.route");
 var borrow_route_1 = require("./routes/borrow.route");
 var app = express_1["default"]();
+// [ "http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app", "https://assignment-4-redux-ph-l-2-ideh.vercel.app" ]
 app.use(cookie_parser_1["default"]());
 app.use(express_1["default"].json());
 app.use(cors_1["default"]({
-    origin: ["http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app", "https://assignment-4-redux-ph-l-2-ideh.vercel.app"],
+    origin: "https://assignment-4-redux-ph-l-2-ideh.vercel.app",
     credentials: true
 }));
 // app.use( express.json( { type: '*/*' } ) );

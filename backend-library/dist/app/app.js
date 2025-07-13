@@ -11,10 +11,11 @@ const auth_route_1 = require("./routes/auth.route");
 const books_route_1 = require("./routes/books.route");
 const borrow_route_1 = require("./routes/borrow.route");
 const app = (0, express_1.default)();
+// [ "http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app", "https://assignment-4-redux-ph-l-2-ideh.vercel.app" ]
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
-    origin: ["http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app", "https://assignment-4-redux-ph-l-2-ideh.vercel.app"],
+    origin: "https://assignment-4-redux-ph-l-2-ideh.vercel.app",
     credentials: true
 }));
 // app.use( express.json( { type: '*/*' } ) );

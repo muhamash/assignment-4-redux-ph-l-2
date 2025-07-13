@@ -9,10 +9,12 @@ import { borrowRouter } from './routes/borrow.route';
 
 const app: Application = express()
 
+// [ "http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app", "https://assignment-4-redux-ph-l-2-ideh.vercel.app" ]
+
 app.use( cookieParser() );
 app.use( express.json() );
 app.use( cors( {
-    origin: ["http://localhost:3000", "http://localhost:5173", "https://assignment-4-redux-ph-l-2.vercel.app", "https://assignment-4-redux-ph-l-2-ideh.vercel.app"],
+    origin: "https://assignment-4-redux-ph-l-2-ideh.vercel.app",
     credentials: true
 } ) );
 // app.use( express.json( { type: '*/*' } ) );
