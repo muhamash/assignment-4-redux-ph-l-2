@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
 import { AuthenticatedRequest } from "../interfaces/authRequest.interface";
 
@@ -11,7 +11,7 @@ export const verifyAccessToken = (
 {
     try
     {
-        const authHeader = req.headers.authorization as string | undefined;
+        const authHeader = req.headers.authorization as string;
 
         if ( !authHeader || !authHeader.startsWith( "Bearer " ) )
         {

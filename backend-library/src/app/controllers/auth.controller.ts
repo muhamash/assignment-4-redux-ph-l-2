@@ -96,7 +96,7 @@ export const login = async ( req: Request, res: Response, next: NextFunction ): 
        
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: false,
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         }).status( 200 ).json( {
@@ -237,7 +237,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
   
         res.cookie( "refreshToken", newRefreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: false,
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         } ).status( 200 ).json( {
@@ -305,7 +305,7 @@ export const logoutUser = async ( req: Request, res: Response, next: NextFunctio
       
         res.clearCookie( "refreshToken", {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: false,
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         } );
       

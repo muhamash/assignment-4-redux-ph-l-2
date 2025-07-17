@@ -81,7 +81,7 @@ const login = async (req, res, next) => {
         });
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: false,
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         }).status(200).json({
@@ -198,7 +198,7 @@ const refreshToken = async (req, res, next) => {
         await session_model_1.Session.findOneAndUpdate({ refreshToken }, { refreshToken: newRefreshToken, expiresAt });
         res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: false,
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         }).status(200).json({
@@ -255,7 +255,7 @@ const logoutUser = async (req, res, next) => {
         await session_model_1.Session.findOneAndDelete({ refreshToken });
         res.clearCookie("refreshToken", {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: false,
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         });
         res.status(200).json({
