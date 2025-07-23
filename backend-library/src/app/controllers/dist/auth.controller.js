@@ -148,9 +148,8 @@ exports.login = function (req, res, next) { return __awaiter(void 0, void 0, Pro
                 _c.sent();
                 res.cookie("refreshToken", refreshToken_1, {
                     httpOnly: true,
-                    secure: true,
-                    // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-                    sameSite: "strict",
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
                     maxAge: 7 * 24 * 60 * 60 * 1000
                 }).status(200).json({
                     success: true,
@@ -202,7 +201,7 @@ exports.refreshToken = function (req, res, next) { return __awaiter(void 0, void
                 _c.trys.push([0, 13, , 14]);
                 console.log("Refresh token request received");
                 console.log("Cookies:", req.cookies);
-                if (!req.cookies || !req.cookies.refreshToken) {
+                if (!req.cookies.refreshToken) {
                     console.log("No refresh token found in cookies");
                     res.status(401).json({
                         success: false,
@@ -286,10 +285,8 @@ exports.refreshToken = function (req, res, next) { return __awaiter(void 0, void
                 _c.sent();
                 res.cookie("refreshToken", newRefreshToken, {
                     httpOnly: true,
-                    secure: true,
-                    // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-                    sameSite: 'strict',
-                    maxAge: 7 * 24 * 60 * 60 * 1000
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
                 }).status(200).json({
                     success: true,
                     message: "Access token successfully retrieved",
@@ -353,7 +350,7 @@ exports.logoutUser = function (req, res, next) { return __awaiter(void 0, void 0
                 _a.sent();
                 res.clearCookie("refreshToken", {
                     httpOnly: true,
-                    secure: false,
+                    secure: process.env.NODE_ENV === "production",
                     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
                 });
                 res.status(200).json({

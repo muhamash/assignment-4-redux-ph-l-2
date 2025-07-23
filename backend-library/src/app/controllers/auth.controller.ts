@@ -94,13 +94,12 @@ export const login = async ( req: Request, res: Response, next: NextFunction ): 
             expiresAt
         } );
        
-        res.cookie("refreshToken", refreshToken, {
+        res.cookie( "refreshToken", refreshToken, {
             httpOnly: true,
-            secure: true,
-            // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            sameSite: "strict",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-        }).status( 200 ).json( {
+        } ).status( 200 ).json( {
             success: true,
             message: "Login successful",
             data: {
@@ -153,7 +152,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
         console.log("Refresh token request received");
         console.log("Cookies:", req.cookies);
         
-        if ( !req.cookies || !req.cookies.refreshToken )
+        if ( !req.cookies.refreshToken )
         {
             console.log("No refresh token found in cookies");
             res.status( 401 ).json( { 
@@ -238,10 +237,8 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
   
         res.cookie( "refreshToken", newRefreshToken, {
             httpOnly: true,
-            secure: true,
-            // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         } ).status( 200 ).json( {
             success: true,
             message: "Access token successfully retrieved",
@@ -307,7 +304,7 @@ export const logoutUser = async ( req: Request, res: Response, next: NextFunctio
       
         res.clearCookie( "refreshToken", {
             httpOnly: true,
-            secure: false,
+            secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         } );
       
