@@ -148,8 +148,9 @@ exports.login = function (req, res, next) { return __awaiter(void 0, void 0, Pro
                 _c.sent();
                 res.cookie("refreshToken", refreshToken_1, {
                     httpOnly: true,
-                    secure: false,
-                    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                    secure: true,
+                    // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                    sameSite: "strict",
                     maxAge: 7 * 24 * 60 * 60 * 1000
                 }).status(200).json({
                     success: true,
@@ -285,8 +286,9 @@ exports.refreshToken = function (req, res, next) { return __awaiter(void 0, void
                 _c.sent();
                 res.cookie("refreshToken", newRefreshToken, {
                     httpOnly: true,
-                    secure: false,
-                    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                    secure: true,
+                    // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                    sameSite: 'strict',
                     maxAge: 7 * 24 * 60 * 60 * 1000
                 }).status(200).json({
                     success: true,
