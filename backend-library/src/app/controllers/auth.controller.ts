@@ -97,7 +97,7 @@ export const login = async ( req: Request, res: Response, next: NextFunction ): 
         res.cookie( "refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         } ).status( 200 ).json( {
             success: true,
@@ -238,7 +238,7 @@ export const refreshToken = async ( req: Request, res: Response, next: NextFunct
         res.cookie( "refreshToken", newRefreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         } ).status( 200 ).json( {
             success: true,
             message: "Access token successfully retrieved",
