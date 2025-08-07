@@ -69,5 +69,5 @@
 # }
 
 
-# Refresh token using cookies from login
+
 # POST http://localhost:3000/api/auth/refresh-token
